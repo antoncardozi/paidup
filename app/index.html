@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaidUp — Never Chase an Invoice Again</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0a1628;
+  --bg-secondary: #111d33;
+  --bg-card: #162032;
+  --bg-input: #1a2740;
+  --bg-hover: #1e2f4a;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-glow: rgba(59, 130, 246, 0.15);
+  --border: #1e3a5f;
+  --border-light: #2a4a6b;
+  --status-paid: #22c55e;
+  --status-paid-bg: rgba(34, 197, 94, 0.12);
+  --status-outstanding: #eab308;
+  --status-outstanding-bg: rgba(234, 179, 8, 0.12);
+  --status-overdue: #f97316;
+  --status-overdue-bg: rgba(249, 115, 22, 0.12);
+  --status-critical: #ef4444;
+  --status-critical-bg: rgba(239, 68, 68, 0.12);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.2s ease;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-input: #f1f5f9;
+  --bg-hover: #e8edf3;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: #d1d9e6;
+  --border-light: #e2e8f0;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* Header */
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.brand { display: flex; align-items: baseline; gap: 0.5rem; }
+.brand h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+.brand .tagline {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.header-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+.btn-secondary {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg-hover); border-color: var(--border-light); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.6rem;
+}
+.btn-ghost:hover { color: var(--text-primary); background: var(--bg-hover); }
+.btn-danger { background: var(--status-critical); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-success { background: var(--status-paid); color: #fff; }
+.btn-success:hover { background: #16a34a; }
+.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
+.btn-icon { padding: 0.5rem; font-size: 1.1rem; }
+
+/* Main Layout */
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem;
+  transition: all var(--transition);
+}
+.stat-card:hover { border-color: var(--border-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.stat-value.accent { color: var(--accent); }
+.stat-value.warning { color: var(--status-overdue); }
+.stat-value.danger { color: var(--status-critical); }
+.stat-value.success { color: var(--status-paid); }
+
+/* Section */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.section-body { padding: 1.4rem; }
+
+/* Forms */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.form-input, .form-select {
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all var(--transition);
+  outline: none;
+}
+.form-input:focus, .form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+/* Invoice Table */
+.invoice-table-wrap { overflow-x: auto; }
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.invoice-table th {
+  padding: 0.7rem 1rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.invoice-table td {
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.invoice-table tr { transition: background var(--transition); }
+.invoice-table tbody tr:hover { background: var(--bg-hover); }
+.invoice-table tbody tr:last-child td { border-bottom: none; }
+
+/* Status Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.badge-paid { background: var(--status-paid-bg); color: var(--status-paid); }
+.badge-outstanding { background: var(--status-outstanding-bg); color: var(--status-outstanding); }
+.badge-overdue { background: var(--status-overdue-bg); color: var(--status-overdue); }
+.badge-critical { background: var(--status-critical-bg); color: var(--status-critical); }
+.badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* Action Cell */
+.action-cell { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+/* Modal / Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s, visibility 0.25s;
+}
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 680px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  transform: translateY(20px);
+  transition: transform 0.25s;
+}
+.modal-overlay.active .modal { transform: translateY(0); }
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 1.1rem; font-weight: 700; }
+.modal-body { padding: 1.4rem; }
+.modal-close {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  font-size: 1.4rem; padding: 0.2rem; transition: color var(--transition);
+}
+.modal-close:hover { color: var(--text-primary); }
+
+/* Email Template Cards */
+.email-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.email-card:last-child { margin-bottom: 0; }
+.email-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.email-card-header:hover { background: var(--bg-hover); }
+.email-card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.email-card-body {
+  padding: 0 1rem 1rem;
+  display: none;
+}
+.email-card.open .email-card-body { display: block; }
+.email-card .chevron {
+  transition: transform 0.2s;
+  color: var(--text-muted);
+}
+.email-card.open .chevron { transform: rotate(180deg); }
+.email-subject {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+}
+.email-body-text {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  padding: 0.8rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.6rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.copy-feedback {
+  font-size: 0.75rem;
+  color: var(--status-paid);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s;
+  margin-left: 0.5rem;
+}
+.copy-feedback.show { opacity: 1; }
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+.empty-state .icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+.empty-state p { font-size: 0.9rem; }
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 1rem;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+  animation: toastIn 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 350px;
+}
+.toast.success { border-left: 3px solid var(--status-paid); }
+.toast.error { border-left: 3px solid var(--status-critical); }
+.toast.info { border-left: 3px solid var(--accent); }
+@keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Paid Row */
+.invoice-table tr.paid-row { opacity: 0.55; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* Data actions bar */
+.data-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Mobile Cards (shown on small screens instead of table) */
+.mobile-cards { display: none; }
+.mobile-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+}
+.mobile-card:last-child { margin-bottom: 0; }
+.mobile-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+}
+.mobile-card-client { font-weight: 700; font-size: 0.95rem; }
+.mobile-card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.8rem;
+}
+.mobile-card-label { color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.mobile-card-actions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+/* Toggle Switch */
+.theme-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 18px; height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+[data-theme="light"] .theme-toggle::after { transform: translateX(20px); }
+.theme-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* Import hidden input */
+#importInput { display: none; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .brand .tagline { display: none; }
+  .header-inner { flex-wrap: wrap; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .invoice-table-wrap { display: none; }
+  .mobile-cards { display: block; }
+  .form-grid { grid-template-columns: 1fr; }
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .data-bar { width: 100%; }
+}
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .header-actions { width: 100%; justify-content: flex-end; }
+  .main { padding: 1rem; }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeInUp 0.35s ease; }
+
+/* Paid date modal input group */
+.paid-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 1rem 0;
+}
+.paid-date-group label { font-size: 0.85rem; color: var(--text-secondary); }
+.paid-date-group .form-input { width: 200px; text-align: center; }
+.paid-date-actions { display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <h1>💰 PaidUp</h1>
+      <span class="tagline">Never chase an invoice again.</span>
+    </div>
+    <div class="header-actions">
+      <label class="theme-toggle-label">
+        <span>☀️</span>
+        <div class="theme-toggle" id="themeToggle" role="button" tabindex="0" aria-label="Toggle theme"></div>
+        <span>🌙</span>
+      </label>
+      <button class="btn btn-primary btn-sm" onclick="toggleForm()">➕ New Invoice</button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card animate-in">
+      <div class="stat-label">Total Invoices</div>
+      <div class="stat-value accent" id="statTotal">0</div>
+    </div>
+    <div class="stat-card animate-in">
+      <div class="stat-label">Outstanding</div>
+      <div class="stat-value warning" id="statOutstanding">$0.00</div>
+    </div>
+    <div class="stat-card animate-in">
+      <div class="stat-label">Overdue</div>
+      <div class="stat-value danger" id="statOverdue">$0.00</div>
+    </div>
+    <div class="stat-card animate-in">
+      <div class="stat-label">Late Fees Owed</div>
+      <div class="stat-value danger" id="statLateFees">$0.00</div>
+    </div>
+  </div>
+
+  <!-- Add Invoice Form -->
+  <div class="section" id="formSection" style="display:none;">
+    <div class="section-header">
+      <div class="section-title">📝 Add New Invoice</div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleForm()">✕ Close</button>
+    </div>
+    <div class="section-body">
+      <form id="invoiceForm" onsubmit="handleSubmit(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="clientName">Client Name *</label>
+            <input class="form-input" type="text" id="clientName" required placeholder="Acme Corp">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="clientEmail">Client Email *</label>
+            <input class="form-input" type="email" id="clientEmail" required placeholder="billing@acme.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="invoiceNumber">Invoice Number *</label>
+            <input class="form-input" type="text" id="invoiceNumber" required placeholder="INV-001">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="amount">Amount ($) *</label>
+            <input class="form-input" type="number" id="invoiceAmount" required min="0.01" step="0.01" placeholder="2500.00">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="dateSent">Date Sent *</label>
+            <input class="form-input" type="date" id="dateSent" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="dueDate">Due Date</label>
+            <input class="form-input" type="date" id="dueDate">
+            <span style="font-size:0.7rem;color:var(--text-muted);">Leave blank for Net 30</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lateFeeRate">Late Fee Rate (%/month)</label>
+            <input class="form-input" type="number" id="lateFeeRate" value="1.5" min="0" step="0.1" placeholder="1.5">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="toggleForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary">💾 Save Invoice</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Invoice Dashboard -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">📊 Invoice Dashboard</div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+          <button class="filter-btn" data-filter="outstanding" onclick="setFilter('outstanding',this)">Outstanding</button>
+          <button class="filter-btn" data-filter="overdue" onclick="setFilter('overdue',this)">Overdue</button>
+          <button class="filter-btn" data-filter="critical" onclick="setFilter('critical',this)">Critical</button>
+          <button class="filter-btn" data-filter="paid" onclick="setFilter('paid',this)">Paid</button>
+        </div>
+        <div class="data-bar">
+          <button class="btn btn-secondary btn-sm" onclick="exportData()">📤 Export</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importInput').click()">📥 Import</button>
+          <input type="file" id="importInput" accept=".json" onchange="importData(event)">
+          <button class="btn btn-ghost btn-sm" onclick="clearDemoData()" id="clearDemoBtn" style="display:none;">🧹 Clear Demo</button>
+        </div>
+      </div>
+    </div>
+    <div class="section-body" style="padding:0;">
+      <!-- Desktop Table -->
+      <div class="invoice-table-wrap">
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Invoice #</th>
+              <th>Amount</th>
+              <th>Sent</th>
+              <th>Due</th>
+              <th>Status</th>
+              <th>Late Fees</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceTableBody"></tbody>
+        </table>
+      </div>
+      <!-- Mobile Cards -->
+      <div class="mobile-cards" id="mobileCards" style="padding:1rem;"></div>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="icon">📭</div>
+        <p>No invoices yet. Add your first one!</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  Built for freelancers who'd rather create than collect. ✨
+</footer>
+
+<!-- Email Modal -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✉️ Follow-Up Emails</div>
+      <button class="modal-close" onclick="closeEmailModal()">×</button>
+    </div>
+    <div class="modal-body" id="emailModalBody"></div>
+  </div>
+</div>
+
+<!-- Mark as Paid Modal -->
+<div class="modal-overlay" id="paidModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">✅ Mark as Paid</div>
+      <button class="modal-close" onclick="closePaidModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="paid-date-group">
+        <label>Payment received on:</label>
+        <input type="date" class="form-input" id="paidDateInput">
+        <div class="paid-date-actions">
+          <button class="btn btn-secondary btn-sm" onclick="closePaidModal()">Cancel</button>
+          <button class="btn btn-success btn-sm" onclick="confirmPaid()">✅ Confirm Paid</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==================== STATE ====================
+const STORAGE_KEY = 'paidup_invoices';
+const DEMO_KEY = 'paidup_has_demo';
+let invoices = [];
+let currentFilter = 'all';
+let pendingPaidId = null;
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  loadTheme();
+  loadInvoices();
+  setDefaultDates();
+  render();
+});
+
+// ==================== THEME ====================
+function loadTheme() {
+  const saved = localStorage.getItem('paidup_theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('paidup_theme', next);
+});
+
+// ==================== DATA ====================
+function loadInvoices() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) throw new Error();
+      invoices = parsed;
+    } catch {
+      invoices = [];
+      showToast('Saved data was corrupted. Starting fresh.', 'error');
+    }
+  } else {
+    loadDemoData();
+  }
+}
+
+function saveInvoices() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
+}
+
+function loadDemoData() {
+  const today = new Date();
+  const daysAgo = (n) => {
+    const d = new Date(today); d.setDate(d.getDate() - n); return d.toISOString().split('T')[0];
+  };
+  invoices = [
+    {
+      id: generateId(),
+      clientName: 'Meridian Studios',
+      clientEmail: 'accounts@meridianstudios.com',
+      invoiceNumber: 'INV-2025-042',
+      amount: 4500,
+      dateSent: daysAgo(45),
+      dueDate: daysAgo(15),
+      lateFeeRate: 1.5,
+      paid: false,
+      paidDate: null,
+      isDemo: true
+    },
+    {
+      id: generateId(),
+      clientName: 'Brightpath Consulting',
+      clientEmail: 'payments@brightpath.io',
+      invoiceNumber: 'INV-2025-039',
+      amount: 2800,
+      dateSent: daysAgo(90),
+      dueDate: daysAgo(60),
+      lateFeeRate: 1.5,
+      paid: false,
+      paidDate: null,
+      isDemo: true
+    },
+    {
+      id: generateId(),
+      clientName: 'Luna Creative Co.',
+      clientEmail: 'hello@lunacreative.co',
+      invoiceNumber: 'INV-2025-044',
+      amount: 1200,
+      dateSent: daysAgo(20),
+      dueDate: daysAgo(-10),
+      lateFeeRate: 1.5,
+      paid: false,
+      paidDate: null,
+      isDemo: true
+    },
+    {
+      id: generateId(),
+      clientName: 'Apex Digital',
+      clientEmail: 'finance@apexdigital.com',
+      invoiceNumber: 'INV-2025-035',
+      amount: 6200,
+      dateSent: daysAgo(60),
+      dueDate: daysAgo(30),
+      lateFeeRate: 2.0,
+      paid: true,
+      paidDate: daysAgo(5),
+      isDemo: true
+    }
+  ];
+  localStorage.setItem(DEMO_KEY, 'true');
+  saveInvoices();
+}
+
+function clearDemoData() {
+  invoices = invoices.filter(inv => !inv.isDemo);
+  localStorage.removeItem(DEMO_KEY);
+  saveInvoices();
+  render();
+  showToast('Demo data cleared!', 'info');
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(invoices, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `paidup-export-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('Data exported!', 'success');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) throw new Error('Invalid format');
+      invoices = data.filter(inv => inv && typeof inv.id === 'string'
+        && typeof inv.clientName === 'string'
+        && typeof inv.amount === 'number' && !isNaN(inv.amount)
+        && typeof inv.dateSent === 'string'
+        && typeof inv.dueDate === 'string')
+        .map(inv => ({ ...inv, id: inv.id.replace(/[^a-zA-Z0-9_-]/g, '') }));
+      saveInvoices();
+      render();
+      showToast(`Imported ${data.length} invoice(s)!`, 'success');
+    } catch {
+      showToast('Invalid file format. Expected JSON array.', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ==================== HELPERS ====================
+function generateId() { return 'inv_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+function formatCurrency(amount) {
+  return '$' + Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function getDaysOverdue(dueDate) {
+  const due = new Date(dueDate + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const diff = Math.floor((today - due) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
+function calcLateFee(amount, rate, dueDate) {
+  const days = getDaysOverdue(dueDate);
+  if (days <= 0) return 0;
+  return amount * (rate / 100) * (days / 30);
+}
+
+function getStatus(invoice) {
+  if (invoice.paid) return 'paid';
+  const days = getDaysOverdue(invoice.dueDate);
+  if (days >= 60) return 'critical';
+  if (days > 0) return 'overdue';
+  return 'outstanding';
+}
+
+function getStatusLabel(status) {
+  const labels = { paid: 'Paid', outstanding: 'Outstanding', overdue: 'Overdue', critical: 'Critical' };
+  return labels[status] || status;
+}
+
+function setDefaultDates() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('dateSent').value = today;
+}
+
+// ==================== FORM ====================
+function toggleForm() {
+  const section = document.getElementById('formSection');
+  const isVisible = section.style.display !== 'none';
+  section.style.display = isVisible ? 'none' : 'block';
+  if (!isVisible) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('clientName').focus();
+  }
+}
+
+function handleSubmit(e) {
+  e.preventDefault();
+  const dateSent = document.getElementById('dateSent').value;
+  let dueDate = document.getElementById('dueDate').value;
+
+  if (!dueDate) {
+    const sent = new Date(dateSent + 'T00:00:00');
+    sent.setDate(sent.getDate() + 30);
+    dueDate = sent.toISOString().split('T')[0];
+  }
+
+  const invoice = {
+    id: generateId(),
+    clientName: document.getElementById('clientName').value.trim(),
+    clientEmail: document.getElementById('clientEmail').value.trim(),
+    invoiceNumber: document.getElementById('invoiceNumber').value.trim(),
+    amount: parseFloat(document.getElementById('invoiceAmount').value),
+    dateSent: dateSent,
+    dueDate: dueDate,
+    lateFeeRate: parseFloat(document.getElementById('lateFeeRate').value) || 1.5,
+    paid: false,
+    paidDate: null,
+    isDemo: false
+  };
+
+  invoices.unshift(invoice);
+  saveInvoices();
+  render();
+  document.getElementById('invoiceForm').reset();
+  setDefaultDates();
+  document.getElementById('lateFeeRate').value = '1.5';
+  toggleForm();
+  showToast(`Invoice ${invoice.invoiceNumber} added!`, 'success');
+}
+
+// ==================== RENDER ====================
+function render() {
+  renderStats();
+  renderTable();
+  renderMobileCards();
+  checkDemoBtn();
+}
+
+function checkDemoBtn() {
+  const hasDemo = invoices.some(inv => inv.isDemo);
+  document.getElementById('clearDemoBtn').style.display = hasDemo ? 'inline-flex' : 'none';
+}
+
+function getFilteredInvoices() {
+  if (currentFilter === 'all') return invoices;
+  return invoices.filter(inv => getStatus(inv) === currentFilter);
+}
+
+function renderStats() {
+  const unpaid = invoices.filter(i => !i.paid);
+  const overdue = unpaid.filter(i => getDaysOverdue(i.dueDate) > 0);
+  const totalOutstanding = unpaid.reduce((s, i) => s + i.amount, 0);
+  const totalOverdue = overdue.reduce((s, i) => s + i.amount, 0);
+  const totalLateFees = overdue.reduce((s, i) => s + calcLateFee(i.amount, i.lateFeeRate, i.dueDate), 0);
+
+  document.getElementById('statTotal').textContent = invoices.length;
+  document.getElementById('statOutstanding').textContent = formatCurrency(totalOutstanding);
+  document.getElementById('statOverdue').textContent = formatCurrency(totalOverdue);
+  document.getElementById('statLateFees').textContent = formatCurrency(totalLateFees);
+}
+
+function renderTable() {
+  const tbody = document.getElementById('invoiceTableBody');
+  const filtered = getFilteredInvoices();
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('emptyState').style.display = 'none';
+
+  tbody.innerHTML = filtered.map(inv => {
+    const status = getStatus(inv);
+    const days = getDaysOverdue(inv.dueDate);
+    const lateFee = inv.paid ? 0 : calcLateFee(inv.amount, inv.lateFeeRate, inv.dueDate);
+    const paidClass = inv.paid ? 'paid-row' : '';
+
+    return `<tr class="${paidClass}">
+      <td>
+        <div style="font-weight:600;">${esc(inv.clientName)}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">${esc(inv.clientEmail)}</div>
+      </td>
+      <td style="font-weight:600;font-family:monospace;">${esc(inv.invoiceNumber)}</td>
+      <td style="font-weight:700;">${formatCurrency(inv.amount)}</td>
+      <td>${formatDate(inv.dateSent)}</td>
+      <td>${formatDate(inv.dueDate)}</td>
+      <td><span class="badge badge-${status}">${getStatusLabel(status)}</span></td>
+      <td style="color:${lateFee > 0 ? 'var(--status-critical)' : 'var(--text-muted)'};font-weight:${lateFee > 0 ? '700' : '400'};">
+        ${lateFee > 0 ? formatCurrency(lateFee) : '—'}
+        ${days > 0 && !inv.paid ? `<div style="font-size:0.7rem;color:var(--text-muted);">${days} day${days !== 1 ? 's' : ''} late</div>` : ''}
+      </td>
+      <td>
+        <div class="action-cell">
+          ${!inv.paid && days > 0 ? `<button class="btn btn-primary btn-sm" onclick="openEmailModal('${inv.id}')">✉️ Follow Up</button>` : ''}
+          ${!inv.paid ? `<button class="btn btn-success btn-sm" onclick="openPaidModal('${inv.id}')">✅ Paid</button>` : `<span style="font-size:0.75rem;color:var(--text-muted);">Paid ${formatDate(inv.paidDate)}</span>`}
+          <button class="btn btn-ghost btn-sm" onclick="deleteInvoice('${inv.id}')" title="Delete">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMobileCards() {
+  const container = document.getElementById('mobileCards');
+  const filtered = getFilteredInvoices();
+
+  if (filtered.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = filtered.map(inv => {
+    const status = getStatus(inv);
+    const days = getDaysOverdue(inv.dueDate);
+    const lateFee = inv.paid ? 0 : calcLateFee(inv.amount, inv.lateFeeRate, inv.dueDate);
+
+    return `<div class="mobile-card" style="${inv.paid ? 'opacity:0.55;' : ''}">
+      <div class="mobile-card-top">
+        <div>
+          <div class="mobile-card-client">${esc(inv.clientName)}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">${esc(inv.invoiceNumber)}</div>
+        </div>
+        <span class="badge badge-${status}">${getStatusLabel(status)}</span>
+      </div>
+      <div class="mobile-card-details">
+        <div><div class="mobile-card-label">Amount</div>${formatCurrency(inv.amount)}</div>
+        <div><div class="mobile-card-label">Due</div>${formatDate(inv.dueDate)}</div>
+        <div><div class="mobile-card-label">Late Fees</div>${lateFee > 0 ? formatCurrency(lateFee) : '—'}</div>
+        <div><div class="mobile-card-label">Days Late</div>${days > 0 && !inv.paid ? days : '—'}</div>
+      </div>
+      <div class="mobile-card-actions">
+        ${!inv.paid && days > 0 ? `<button class="btn btn-primary btn-sm" onclick="openEmailModal('${inv.id}')">✉️ Follow Up</button>` : ''}
+        ${!inv.paid ? `<button class="btn btn-success btn-sm" onclick="openPaidModal('${inv.id}')">✅ Paid</button>` : `<span style="font-size:0.75rem;color:var(--text-muted);">Paid ${formatDate(inv.paidDate)}</span>`}
+        <button class="btn btn-ghost btn-sm" onclick="deleteInvoice('${inv.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ==================== FILTERS ====================
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+  renderMobileCards();
+}
+
+// ==================== ACTIONS ====================
+function deleteInvoice(id) {
+  if (!confirm('Delete this invoice?')) return;
+  invoices = invoices.filter(inv => inv.id !== id);
+  saveInvoices();
+  render();
+  showToast('Invoice deleted.', 'info');
+}
+
+function openPaidModal(id) {
+  pendingPaidId = id;
+  document.getElementById('paidDateInput').value = new Date().toISOString().split('T')[0];
+  document.getElementById('paidModal').classList.add('active');
+}
+
+function closePaidModal() {
+  document.getElementById('paidModal').classList.remove('active');
+  pendingPaidId = null;
+}
+
+function confirmPaid() {
+  if (!pendingPaidId) return;
+  const inv = invoices.find(i => i.id === pendingPaidId);
+  if (inv) {
+    inv.paid = true;
+    inv.paidDate = document.getElementById('paidDateInput').value || new Date().toISOString().split('T')[0];
+    saveInvoices();
+    render();
+    showToast(`${inv.invoiceNumber} marked as paid!`, 'success');
+  }
+  closePaidModal();
+}
+
+// ==================== EMAIL GENERATOR ====================
+function openEmailModal(id) {
+  const inv = invoices.find(i => i.id === id);
+  if (!inv) return;
+
+  const days = getDaysOverdue(inv.dueDate);
+  const lateFee = calcLateFee(inv.amount, inv.lateFeeRate, inv.dueDate);
+  const totalOwed = inv.amount + lateFee;
+  const amountStr = formatCurrency(inv.amount);
+  const lateFeeStr = formatCurrency(lateFee);
+  const totalStr = formatCurrency(totalOwed);
+  const firstName = inv.clientName.split(' ')[0].split(',')[0];
+
+  const emails = [
+    {
+      tag: '🟡 Gentle Reminder',
+      tagColor: 'var(--status-outstanding)',
+      range: '1–7 days overdue',
+      subject: `Quick reminder — Invoice ${inv.invoiceNumber}`,
+      body: `Hi ${firstName},
+
+Hope you're doing well! Just a quick heads up — invoice ${inv.invoiceNumber} for ${amountStr} was due on ${formatDate(inv.dueDate)}, and it looks like it's still open. It's now ${days} day${days !== 1 ? 's' : ''} past due.
+
+Totally understand things get busy — just wanted to make sure it didn't slip through the cracks. If it's already been sent, feel free to disregard this!
+
+Would you mind taking a look when you get a moment?
+
+Thanks so much,
+[Your Name]`
+    },
+    {
+      tag: '🟠 Firm Follow-Up',
+      tagColor: 'var(--status-overdue)',
+      range: '8–30 days overdue',
+      subject: `Follow-up: Invoice ${inv.invoiceNumber} — ${days} days overdue`,
+      body: `Hi ${firstName},
+
+I'm following up regarding invoice ${inv.invoiceNumber} for ${amountStr}, which was due on ${formatDate(inv.dueDate)}. As of today, it is ${days} days overdue.
+
+Per our agreement, a late fee of ${inv.lateFeeRate}% per month applies to overdue balances. The current late fee is ${lateFeeStr}, bringing the total outstanding to ${totalStr}.
+
+I'd appreciate it if we could get this resolved soon. If there's an issue with the invoice or you need to discuss payment arrangements, I'm happy to work something out — just let me know.
+
+Could you provide an update on when I can expect payment?
+
+Best regards,
+[Your Name]`
+    },
+    {
+      tag: '🔴 Final Notice',
+      tagColor: 'var(--status-critical)',
+      range: '30+ days overdue',
+      subject: `FINAL NOTICE: Invoice ${inv.invoiceNumber} — Immediate payment required`,
+      body: `Dear ${firstName},
+
+This is a final notice regarding the outstanding balance on invoice ${inv.invoiceNumber}.
+
+The original amount of ${amountStr} was due on ${formatDate(inv.dueDate)} and is now ${days} days past due. With applicable late fees of ${lateFeeStr}, the total balance owed is ${totalStr}.
+
+Despite previous reminders, this invoice remains unpaid. I need to receive payment within 7 business days of this notice.
+
+If payment is not received by that date, I will have no choice but to explore other options to recover the amount owed, which may include engaging a collections agency or pursuing the matter further.
+
+If there are circumstances I should be aware of, please contact me immediately so we can discuss a resolution.
+
+Regards,
+[Your Name]`
+    }
+  ];
+
+  const body = document.getElementById('emailModalBody');
+  body.innerHTML = `
+    <div style="margin-bottom:1rem;padding:0.8rem;background:var(--bg-input);border-radius:var(--radius-sm);font-size:0.85rem;">
+      <strong>${esc(inv.clientName)}</strong> · ${esc(inv.invoiceNumber)} · ${amountStr} · ${days} days overdue
+    </div>
+    ${emails.map((em, idx) => `
+      <div class="email-card ${idx === 0 ? 'open' : ''}" id="emailCard${idx}">
+        <div class="email-card-header" onclick="toggleEmailCard(${idx})">
+          <div class="email-card-tag" style="color:${em.tagColor};">${em.tag} <span style="font-weight:400;color:var(--text-muted);font-size:0.75rem;">(${em.range})</span></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="email-card-body">
+          <div class="email-subject">Subject: ${esc(em.subject)}</div>
+          <div class="email-body-text">${esc(em.body)}</div>
+          <div style="display:flex;align-items:center;">
+            <button class="btn btn-primary btn-sm" onclick="copyEmail(${idx})">📋 Copy to Clipboard</button>
+            <span class="copy-feedback" id="copyFeedback${idx}">✓ Copied!</span>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  // Store email data for copy
+  body._emails = emails;
+  document.getElementById('emailModal').classList.add('active');
+}
+
+function toggleEmailCard(idx) {
+  document.getElementById('emailCard' + idx).classList.toggle('open');
+}
+
+function copyEmail(idx) {
+  const emails = document.getElementById('emailModalBody')._emails;
+  if (!emails || !emails[idx]) return;
+  const em = emails[idx];
+  const text = `Subject: ${em.subject}\n\n${em.body}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const fb = document.getElementById('copyFeedback' + idx);
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2000);
+  }).catch(() => {
+    showToast('Failed to copy. Try selecting manually.', 'error');
+  });
+}
+
+function closeEmailModal() {
+  document.getElementById('emailModal').classList.remove('active');
+}
+
+// Close modals on overlay click
+document.getElementById('emailModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeEmailModal();
+});
+document.getElementById('paidModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closePaidModal();
+});
+
+// Close modals on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeEmailModal();
+    closePaidModal();
+  }
+});
+
+// ==================== TOAST ====================
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  toast.innerHTML = `<span>${icons[type] || ''}</span> ${esc(message)}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    toast.style.transition = 'all 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+</script>
+</body>
+</html>

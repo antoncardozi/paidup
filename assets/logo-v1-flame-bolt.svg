@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <!-- PaidUp Logo V1: Flame + Upward Bolt -->
+  <!-- Logomark: stylized flame with an upward arrow/bolt integrated -->
+  <defs>
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="60%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Dark background for contrast -->
+  <rect width="400" height="100" rx="12" fill="#0a0e1a"/>
+  
+  <!-- Flame logomark -->
+  <g transform="translate(20, 8)">
+    <!-- Outer flame shape -->
+    <path d="M30 80 C30 80, 10 55, 18 35 C22 25, 28 28, 30 20 C30 12, 35 5, 42 5 C49 5, 54 12, 54 20 C56 28, 62 25, 66 35 C74 55, 54 80, 54 80 Z" 
+          fill="url(#flameGrad)" opacity="0.9"/>
+    <!-- Inner upward bolt/arrow -->
+    <path d="M42 72 L36 48 L42 52 L42 18 L42 18 L42 52 L48 48 L42 72Z" 
+          fill="#0a0e1a" stroke="url(#boltGrad)" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Simplified arrow pointing up inside flame -->
+    <polygon points="42,15 35,35 40,35 40,55 44,55 44,35 49,35" fill="#0a0e1a"/>
+    <polygon points="42,18 37,33 40.5,33 40.5,50 43.5,50 43.5,33 47,33" fill="url(#boltGrad)"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <text x="100" y="62" font-family="'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif" font-size="42" font-weight="800" letter-spacing="-1">
+    <tspan fill="#ffffff">Paid</tspan><tspan fill="#3b82f6">Up</tspan>
+  </text>
+  
+  <!-- Tagline -->
+  <text x="102" y="80" font-family="'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif" font-size="11" font-weight="400" fill="#6b7280" letter-spacing="0.5">
+    Never chase an invoice again.
+  </text>
+</svg>

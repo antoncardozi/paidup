@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <!-- PaidUp Logo V3: Minimal Rocket/Arrow with $ -->
+  <!-- Concept: Money going UP fast — speed, getting paid -->
+  <defs>
+    <linearGradient id="rocketGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="trailGrad3" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="400" height="100" rx="12" fill="#0a0e1a"/>
+  
+  <!-- Logomark: Abstract upward arrow with speed lines -->
+  <g transform="translate(22, 8)">
+    <!-- Speed trail lines -->
+    <line x1="25" y1="78" x2="25" y2="60" stroke="#f59e0b" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+    <line x1="35" y1="82" x2="35" y2="68" stroke="#f59e0b" stroke-width="2" opacity="0.2" stroke-linecap="round"/>
+    <line x1="45" y1="78" x2="45" y2="64" stroke="#f59e0b" stroke-width="2" opacity="0.15" stroke-linecap="round"/>
+    
+    <!-- Main upward shape — rounded rectangle with pointed top -->
+    <rect x="20" y="22" width="30" height="48" rx="6" fill="url(#rocketGrad)"/>
+    <!-- Pointed tip -->
+    <polygon points="20,26 35,6 50,26" fill="url(#rocketGrad)"/>
+    <!-- Rounded join -->
+    <rect x="20" y="20" width="30" height="12" fill="url(#rocketGrad)"/>
+    
+    <!-- Dollar sign cutout -->
+    <text x="35" y="58" font-family="'Inter', system-ui, sans-serif" font-size="28" font-weight="800" fill="#0a0e1a" text-anchor="middle">$</text>
+    
+    <!-- Exhaust/fire at bottom -->
+    <path d="M24 70 Q28 82, 28 85 Q30 80, 35 88 Q40 80, 42 85 Q42 82, 46 70" 
+          fill="#f59e0b" opacity="0.8"/>
+    <path d="M28 70 Q32 78, 35 82 Q38 78, 42 70" 
+          fill="#10b981" opacity="0.6"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <text x="95" y="55" font-family="'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif" font-size="40" font-weight="800" letter-spacing="-1">
+    <tspan fill="#ffffff">Paid</tspan><tspan fill="#3b82f6">Up</tspan>
+  </text>
+  
+  <!-- Speed accent lines next to text -->
+  <line x1="95" y1="62" x2="130" y2="62" stroke="url(#rocketGrad)" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  
+  <!-- Tagline -->
+  <text x="95" y="78" font-family="'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif" font-size="11" font-weight="400" fill="#6b7280" letter-spacing="0.5">
+    Never chase an invoice again.
+  </text>
+</svg>

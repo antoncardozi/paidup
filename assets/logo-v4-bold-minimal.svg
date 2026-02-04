@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <!-- PaidUp Logo V4: Bold Minimal — Clean Type + Abstract P/Flame Mark -->
+  <!-- Concept: The cleanest version. A "P" that doubles as a flame. Indie SaaS energy. -->
+  <defs>
+    <linearGradient id="pGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="accentGrad4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="400" height="100" rx="12" fill="#0a0e1a"/>
+  
+  <!-- Logomark: "P" that looks like a flame -->
+  <g transform="translate(20, 10)">
+    <!-- The P/flame shape -->
+    <path d="M22 80 L22 30 C22 30, 22 12, 35 8 C48 4, 58 12, 58 24 C58 36, 48 42, 38 42 L22 42" 
+          stroke="url(#pGrad)" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Flame flick at top of P -->
+    <path d="M35 8 C33 4, 36 -2, 40 2 C42 -1, 44 3, 42 8" 
+          stroke="#f59e0b" stroke-width="3" fill="none" stroke-linecap="round"/>
+    
+    <!-- Small spark -->
+    <circle cx="40" cy="0" r="2.5" fill="#f59e0b" opacity="0.8"/>
+    <circle cx="44" cy="4" r="1.5" fill="#f59e0b" opacity="0.5"/>
+  </g>
+  
+  <!-- Wordmark — extra bold, tight -->
+  <text x="100" y="62" font-family="'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif" font-size="46" font-weight="900" letter-spacing="-2">
+    <tspan fill="#ffffff">Paid</tspan><tspan fill="#3b82f6">Up</tspan>
+  </text>
+  
+  <!-- Fire emoji accent — subtle nod to the current placeholder -->
+  <text x="268" y="46" font-size="16" opacity="0.6">🔥</text>
+  
+  <!-- Tagline -->
+  <text x="100" y="82" font-family="'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif" font-size="11.5" font-weight="500" fill="#6b7280" letter-spacing="0.3">
+    Never chase an invoice again.
+  </text>
+</svg>

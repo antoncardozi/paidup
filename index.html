@@ -1,0 +1,1579 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaidUp â€” Stop Chasing Invoices. Start Getting Paid.</title>
+<meta name="description" content="PaidUp helps freelancers stop chasing late invoices. Paste your invoice details, get professional follow-up emails, and track everything in one dashboard.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="PaidUp â€” Stop Chasing Invoices. Start Getting Paid.">
+<meta property="og:description" content="85% of freelancers get paid late. PaidUp generates escalating follow-up emails and tracks your overdue invoices automatically.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://paid-up.com">
+<meta property="og:image" content="https://paid-up.com/og-image.png">
+<meta property="og:site_name" content="PaidUp">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PaidUp â€” Stop Chasing Invoices">
+<meta name="twitter:description" content="85% of freelancers get paid late. PaidUp fixes that.">
+<meta name="twitter:image" content="https://paid-up.com/og-image.png">
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ðŸ’°</text></svg>">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0a1628;
+  --bg-secondary: #111d33;
+  --bg-card: #162032;
+  --bg-input: #1a2740;
+  --bg-hover: #1e2f4a;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-glow: rgba(59, 130, 246, 0.15);
+  --border: #1e3a5f;
+  --border-light: #2a4a6b;
+  --green: #22c55e;
+  --green-bg: rgba(34, 197, 94, 0.12);
+  --orange: #f97316;
+  --orange-bg: rgba(249, 115, 22, 0.12);
+  --red: #ef4444;
+  --yellow: #eab308;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.2s ease;
+  --max-width: 1120px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ============ NAV ============ */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(10, 22, 40, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow 0.3s;
+}
+.nav.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+.nav-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-brand {
+  font-size: 1.35rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.nav-links { display: flex; align-items: center; gap: 1.5rem; }
+.nav-links a {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.nav-links a:hover { color: var(--text-primary); text-decoration: none; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  font-family: inherit;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.35); text-decoration: none; }
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+}
+.btn-secondary:hover { background: var(--bg-hover); border-color: var(--accent); text-decoration: none; }
+.btn-lg { padding: 0.85rem 2rem; font-size: 1rem; border-radius: var(--radius); }
+.btn-xl { padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: var(--radius); }
+.btn-lifetime {
+  background: linear-gradient(135deg, var(--orange), #f59e0b);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.btn-lifetime:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,115,22,0.35); text-decoration: none; }
+.btn-lifetime::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: skewX(-25deg);
+  animation: shimmer 3s infinite;
+}
+@keyframes shimmer {
+  0% { left: -75%; }
+  100% { left: 125%; }
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.3rem;
+}
+
+/* ============ HERO ============ */
+.hero {
+  padding: 8rem 1.5rem 5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  position: relative;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  background: var(--orange-bg);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--orange);
+  margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.2rem;
+}
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin: 0 auto 2.2rem;
+  line-height: 1.5;
+}
+.hero-ctas {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+.hero-proof {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.hero-proof span { display: flex; align-items: center; gap: 0.3rem; }
+
+/* Dashboard Mockup */
+.mockup-wrap {
+  max-width: 900px;
+  margin: 3rem auto 0;
+  position: relative;
+}
+.mockup {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.08);
+}
+.mockup-bar {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mockup-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-light);
+}
+.mockup-dot:nth-child(1) { background: #ef4444; }
+.mockup-dot:nth-child(2) { background: #eab308; }
+.mockup-dot:nth-child(3) { background: #22c55e; }
+.mockup-body { padding: 1.2rem; }
+.mock-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.mock-stat {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem;
+}
+.mock-stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.mock-stat-val { font-size: 1.15rem; font-weight: 800; margin-top: 0.2rem; }
+.mock-stat-val.blue { color: var(--accent); }
+.mock-stat-val.orange { color: var(--orange); }
+.mock-stat-val.red { color: var(--red); }
+.mock-stat-val.green { color: var(--green); }
+.mock-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.mock-table th {
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+}
+.mock-table td {
+  padding: 0.6rem 0.7rem;
+  font-size: 0.78rem;
+  border-bottom: 1px solid var(--border);
+}
+.mock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.mock-badge.overdue { background: var(--orange-bg); color: var(--orange); }
+.mock-badge.critical { background: rgba(239,68,68,0.12); color: var(--red); }
+.mock-badge.paid { background: var(--green-bg); color: var(--green); }
+.mock-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.mock-btn {
+  padding: 0.2rem 0.5rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+.mockup-glow {
+  position: absolute;
+  bottom: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ============ SECTIONS ============ */
+.section {
+  padding: 5rem 1.5rem;
+  position: relative;
+}
+.section-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.8rem;
+}
+.section-title {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  line-height: 1.15;
+}
+.section-sub {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.6;
+}
+.section-center { text-align: center; }
+.section-center .section-sub { margin: 0 auto; }
+.section-alt { background: var(--bg-secondary); }
+
+/* ============ PAIN ============ */
+.pain-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+.pain-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.pain-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  transition: all var(--transition);
+}
+.pain-stat:hover { border-color: var(--border-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.pain-stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+.pain-stat-number.orange { color: var(--orange); }
+.pain-stat-number.red { color: var(--red); }
+.pain-stat-number.yellow { color: var(--yellow); }
+.pain-stat-text { color: var(--text-secondary); font-size: 0.92rem; }
+.pain-copy h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+.pain-copy p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.pain-copy .highlight { color: var(--orange); font-weight: 600; }
+
+/* ============ HOW IT WORKS ============ */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+.step {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  position: relative;
+  transition: all var(--transition);
+}
+.step:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
+.step-num {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+.step-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.step h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.step p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.steps-connector {
+  display: none;
+}
+
+/* ============ FEATURES ============ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.feature {
+  padding: 1.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+}
+.feature:hover { border-color: var(--border-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.feature-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+}
+.feature h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.feature p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* ============ EMAIL PREVIEW ============ */
+.email-preview-section { overflow: hidden; }
+.email-preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+.email-preview-copy { }
+.email-preview-copy h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.email-preview-copy p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+.tone-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.tone-tag {
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 2px solid transparent;
+}
+.tone-tag.gentle { background: rgba(234,179,8,0.12); color: var(--yellow); }
+.tone-tag.gentle.active, .tone-tag.gentle:hover { border-color: var(--yellow); }
+.tone-tag.firm { background: var(--orange-bg); color: var(--orange); }
+.tone-tag.firm.active, .tone-tag.firm:hover { border-color: var(--orange); }
+.tone-tag.final { background: rgba(239,68,68,0.12); color: var(--red); }
+.tone-tag.final.active, .tone-tag.final:hover { border-color: var(--red); }
+
+.email-mockup {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.email-mockup-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.email-mockup-body {
+  padding: 1.2rem;
+}
+.email-mockup-subject {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.8rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+}
+.email-mockup-text {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  padding: 0.8rem;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* ============ SOCIAL PROOF ============ */
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.proof-card {
+  padding: 1.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.proof-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+.proof-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+.proof-card p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5; }
+
+/* ============ PRICING ============ */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+  align-items: start;
+}
+.price-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  position: relative;
+  transition: all var(--transition);
+}
+.price-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
+.price-card.popular {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(59,130,246,0.15);
+}
+.price-card.lifetime {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 1px var(--orange), 0 8px 32px rgba(249,115,22,0.15);
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(249,115,22,0.04) 100%);
+}
+.price-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.price-badge.blue { background: var(--accent); color: #fff; }
+.price-badge.orange { background: var(--orange); color: #fff; }
+.price-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+.price-amount {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0.8rem 0 0.3rem;
+}
+.price-amount span { font-size: 1rem; font-weight: 500; color: var(--text-muted); }
+.price-desc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  min-height: 40px;
+}
+.price-features {
+  list-style: none;
+  margin-bottom: 1.8rem;
+}
+.price-features li {
+  padding: 0.45rem 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.price-features li::before {
+  content: 'âœ“';
+  color: var(--green);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.price-card .btn { width: 100%; }
+.price-original {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 400;
+}
+.spots-left {
+  margin-top: 0.8rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--orange);
+  font-weight: 600;
+}
+.spots-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-input);
+  border-radius: 999px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+.spots-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--orange), var(--red));
+  border-radius: 999px;
+  transition: width 1s ease;
+}
+
+/* ============ FAQ ============ */
+.faq-list {
+  max-width: 720px;
+  margin: 3rem auto 0;
+}
+.faq-item {
+  border-bottom: 1px solid var(--border);
+}
+.faq-q {
+  padding: 1.2rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color var(--transition);
+  gap: 1rem;
+}
+.faq-q:hover { color: var(--accent); }
+.faq-chevron {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+.faq-item.open .faq-chevron { transform: rotate(180deg); }
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+.faq-item.open .faq-a {
+  max-height: 300px;
+  padding-bottom: 1.2rem;
+}
+
+/* ============ FINAL CTA ============ */
+.final-cta {
+  padding: 5rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.final-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.final-cta-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+.final-cta h2 {
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+.final-cta p {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+.final-cta .btn { margin: 0 0.5rem; }
+
+/* ============ FOOTER ============ */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 1.5rem;
+}
+.footer-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.footer-brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.footer-copy { color: var(--text-muted); font-size: 0.82rem; }
+.footer-links { display: flex; gap: 1.5rem; }
+.footer-links a { color: var(--text-muted); font-size: 0.82rem; text-decoration: none; }
+.footer-links a:hover { color: var(--text-secondary); }
+
+/* ============ ANIMATIONS ============ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.live-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-dot 2s infinite;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+  .pain-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .pain-copy { order: -1; }
+  .steps { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .email-preview-grid { grid-template-columns: 1fr; }
+  .proof-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; }
+  .mock-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    gap: 0.8rem;
+  }
+  .hamburger { display: block; }
+  .hero { padding: 6.5rem 1rem 3rem; }
+  .hero h1 { font-size: 2rem; }
+  .section { padding: 3.5rem 1rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .mock-table th:nth-child(4), .mock-table td:nth-child(4),
+  .mock-table th:nth-child(5), .mock-table td:nth-child(5) { display: none; }
+  .final-cta .hero-ctas { flex-direction: column; align-items: center; }
+}
+
+/* ============ COUNTDOWN ============ */
+.countdown {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+.countdown-unit {
+  text-align: center;
+}
+.countdown-num {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--orange);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.6rem;
+  min-width: 42px;
+  font-variant-numeric: tabular-nums;
+}
+.countdown-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.2rem;
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">ðŸ’° PaidUp</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">â˜°</button>
+    <div class="nav-links" id="navLinks">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="/app" class="btn btn-primary">Try Free â†’</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge reveal">
+      ðŸ”¥ Launch Offer â€” Lifetime access for just $49
+    </div>
+    <h1 class="reveal reveal-delay-1">
+      Stop Chasing Invoices.<br><span>Start Getting Paid.</span>
+    </h1>
+    <p class="hero-sub reveal reveal-delay-2">
+      85% of freelancers deal with late payments. PaidUp generates professional follow-up emails and tracks your overdue invoices â€” so you can focus on the work you love, not playing debt collector.
+    </p>
+    <div class="hero-ctas reveal reveal-delay-3">
+      <a href="/app" class="btn btn-primary btn-xl">Start Getting Paid â€” Free â†’</a>
+      <a href="#how-it-works" class="btn btn-secondary btn-lg">See How It Works</a>
+    </div>
+    <div class="hero-proof reveal reveal-delay-3">
+      <span>âœ… Free forever plan</span>
+      <span>âš¡ Works in 30 seconds</span>
+      <span>ðŸ”’ Your data stays local</span>
+    </div>
+
+    <!-- Dashboard Mockup -->
+    <div class="mockup-wrap reveal">
+      <div class="mockup">
+        <div class="mockup-bar">
+          <span class="mockup-dot"></span>
+          <span class="mockup-dot"></span>
+          <span class="mockup-dot"></span>
+          <span style="margin-left:0.5rem;font-size:0.75rem;color:var(--text-muted);">paid-up.com/app</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mock-stats">
+            <div class="mock-stat">
+              <div class="mock-stat-label">Total Invoices</div>
+              <div class="mock-stat-val blue">7</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Outstanding</div>
+              <div class="mock-stat-val orange">$12,400</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Overdue</div>
+              <div class="mock-stat-val red">$8,700</div>
+            </div>
+            <div class="mock-stat">
+              <div class="mock-stat-label">Late Fees Owed</div>
+              <div class="mock-stat-val red">$436</div>
+            </div>
+          </div>
+          <table class="mock-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Invoice</th>
+                <th>Amount</th>
+                <th>Due</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Meridian Studios</td>
+                <td style="font-family:monospace;font-size:0.75rem;">INV-042</td>
+                <td style="font-weight:700;">$4,500</td>
+                <td>Jun 15</td>
+                <td><span class="mock-badge overdue">Overdue</span></td>
+                <td><span class="mock-btn">âœ‰ï¸ Follow Up</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Brightpath Consulting</td>
+                <td style="font-family:monospace;font-size:0.75rem;">INV-039</td>
+                <td style="font-weight:700;">$2,800</td>
+                <td>May 1</td>
+                <td><span class="mock-badge critical">Critical</span></td>
+                <td><span class="mock-btn">âœ‰ï¸ Follow Up</span></td>
+              </tr>
+              <tr style="opacity:0.55;">
+                <td style="font-weight:600;">Apex Digital</td>
+                <td style="font-family:monospace;font-size:0.75rem;">INV-035</td>
+                <td style="font-weight:700;">$6,200</td>
+                <td>Apr 10</td>
+                <td><span class="mock-badge paid">Paid</span></td>
+                <td style="font-size:0.7rem;color:var(--text-muted);">Jun 25</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="mockup-glow"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Pain Section -->
+<section class="section section-alt" id="pain">
+  <div class="section-inner">
+    <div class="pain-grid">
+      <div class="pain-stats">
+        <div class="pain-stat reveal">
+          <div class="pain-stat-number orange">85%</div>
+          <div class="pain-stat-text">of freelancers report getting paid late at least once</div>
+        </div>
+        <div class="pain-stat reveal reveal-delay-1">
+          <div class="pain-stat-number red">$17,600</div>
+          <div class="pain-stat-text">average outstanding invoices per freelancer at any given time</div>
+        </div>
+        <div class="pain-stat reveal reveal-delay-2">
+          <div class="pain-stat-number yellow">14 hrs/mo</div>
+          <div class="pain-stat-text">spent chasing payments instead of doing billable work</div>
+        </div>
+      </div>
+      <div class="pain-copy reveal">
+        <div class="section-label">The Problem</div>
+        <h3>You became a freelancer to do great work.<br>Not play debt collector.</h3>
+        <p>
+          You finished the project. Delivered on time. Sent the invoice. And thenâ€¦ <span class="highlight">silence</span>.
+        </p>
+        <p>
+          Now you're writing awkward follow-up emails, wondering if you sound too pushy or too passive. Checking your bank account every morning. Losing sleep over money that's rightfully yours.
+        </p>
+        <p>
+          The worst part? <span class="highlight">Every hour you spend chasing payments is an hour you're not earning.</span> You didn't go independent to become an accounts receivable department.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="section" id="how-it-works">
+  <div class="section-inner section-center">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title reveal">Three steps. Thirty seconds.<br>Get your money.</h2>
+    <p class="section-sub reveal">No sign-up forms. No credit card. Just paste your invoice details and let PaidUp handle the awkward part.</p>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div class="step-icon">ðŸ“</div>
+        <h3>Add Your Invoice</h3>
+        <p>Paste the client name, amount, and due date. PaidUp auto-calculates days overdue and late fees for you.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">2</div>
+        <div class="step-icon">ðŸŽ¯</div>
+        <h3>Pick Your Tone</h3>
+        <p>Choose from gentle reminder, firm follow-up, or final notice. Each template is professionally written and battle-tested.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">3</div>
+        <div class="step-icon">âœ‰ï¸</div>
+        <h3>Send & Track</h3>
+        <p>Copy the email and send it, or let PaidUp auto-send escalating sequences from your own email address. Track everything.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Email Preview -->
+<section class="section section-alt email-preview-section" id="email-preview">
+  <div class="section-inner">
+    <div class="email-preview-grid">
+      <div class="email-preview-copy reveal">
+        <div class="section-label">Smart Follow-Ups</div>
+        <h3>Professionally written. Perfectly escalating. Ready to send.</h3>
+        <p>
+          No more staring at a blank screen wondering how to ask for your own money. PaidUp generates follow-up emails that strike exactly the right tone â€” from friendly nudge to final notice.
+        </p>
+        <p>
+          Each email includes the invoice number, amount, days overdue, and calculated late fees. All personalized. All professional.
+        </p>
+        <div class="tone-tags">
+          <span class="tone-tag gentle active" onclick="switchTone('gentle', this)">ðŸŸ¡ Gentle</span>
+          <span class="tone-tag firm" onclick="switchTone('firm', this)">ðŸŸ  Firm</span>
+          <span class="tone-tag final" onclick="switchTone('final', this)">ðŸ”´ Final Notice</span>
+        </div>
+      </div>
+      <div class="email-mockup reveal reveal-delay-1">
+        <div class="email-mockup-header">
+          âœ‰ï¸ <span>Email Preview</span>
+        </div>
+        <div class="email-mockup-body">
+          <div class="email-mockup-subject" id="emailSubject">Subject: Quick reminder â€” Invoice INV-2025-042</div>
+          <div class="email-mockup-text" id="emailBody">Hi Sarah,
+
+Hope you're doing well! Just a quick heads up â€” invoice INV-2025-042 for $4,500.00 was due on Jun 15, 2025, and it looks like it's still open. It's now 15 days past due.
+
+Totally understand things get busy â€” just wanted to make sure it didn't slip through the cracks.
+
+Would you mind taking a look when you get a moment?
+
+Thanks so much,
+[Your Name]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features">
+  <div class="section-inner section-center">
+    <div class="section-label">Features</div>
+    <h2 class="section-title reveal">Everything you need.<br>Nothing you don't.</h2>
+    <p class="section-sub reveal">PaidUp is focused, fast, and built for freelancers who want results â€” not another bloated SaaS.</p>
+
+    <div class="features-grid">
+      <div class="feature reveal">
+        <div class="feature-icon">âš¡</div>
+        <h3>Instant Setup</h3>
+        <p>No account needed for free tier. Open the app, paste your invoice, done. Under 30 seconds.</p>
+      </div>
+      <div class="feature reveal reveal-delay-1">
+        <div class="feature-icon">âœ‰ï¸</div>
+        <h3>3-Tier Email Templates</h3>
+        <p>Gentle â†’ Firm â†’ Final Notice. Professionally written, automatically personalized with your invoice details.</p>
+      </div>
+      <div class="feature reveal reveal-delay-2">
+        <div class="feature-icon">ðŸ“Š</div>
+        <h3>Dashboard Overview</h3>
+        <p>See total outstanding, overdue amounts, and late fees at a glance. Color-coded status badges keep you organized.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-icon">ðŸ’°</div>
+        <h3>Auto Late Fees</h3>
+        <p>Set your rate, and PaidUp calculates accumulated late fees daily. Include them in your follow-ups automatically.</p>
+      </div>
+      <div class="feature reveal reveal-delay-1">
+        <div class="feature-icon">ðŸ”’</div>
+        <h3>Privacy First</h3>
+        <p>Your data stays in your browser. No server uploads. No third-party tracking. Export anytime as JSON.</p>
+      </div>
+      <div class="feature reveal reveal-delay-2">
+        <div class="feature-icon">ðŸ“±</div>
+        <h3>Mobile Ready</h3>
+        <p>Full responsive design. Check your invoices and send follow-ups from your phone, tablet, or desktop.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-icon">ðŸ”„</div>
+        <h3>Auto-Send Sequences</h3>
+        <p>Pro feature: Set it and forget it. PaidUp sends escalating emails on your schedule from your own email address.</p>
+      </div>
+      <div class="feature reveal reveal-delay-1">
+        <div class="feature-icon">ðŸ“ˆ</div>
+        <h3>Payment Analytics</h3>
+        <p>Pro feature: See which clients pay on time, who's always late, and your average days-to-payment trend.</p>
+      </div>
+      <div class="feature reveal reveal-delay-2">
+        <div class="feature-icon">ðŸŒ™</div>
+        <h3>Dark & Light Mode</h3>
+        <p>Easy on the eyes, day or night. Toggle between themes with one click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social Proof -->
+<section class="section section-alt" id="community">
+  <div class="section-inner section-center">
+    <div class="section-label">Community</div>
+    <h2 class="section-title reveal">Built by freelancers.<br>For freelancers.</h2>
+    <p class="section-sub reveal">PaidUp was born from real frustration. We've been there â€” waiting 60+ days for a check that should've arrived in 30. Join the founders who are done being polite about it.</p>
+
+    <div class="proof-grid">
+      <div class="proof-card reveal">
+        <div class="proof-icon">ðŸš€</div>
+        <h3>Early Adopter Community</h3>
+        <p>Join the first 200 founding members and shape PaidUp's roadmap. Your feedback builds the product.</p>
+      </div>
+      <div class="proof-card reveal reveal-delay-1">
+        <div class="proof-icon">ðŸ› ï¸</div>
+        <h3>Indie Built</h3>
+        <p>No VC funding. No bloat. Built by a solo freelancer who got tired of writing the same follow-up email for the hundredth time.</p>
+      </div>
+      <div class="proof-card reveal reveal-delay-2">
+        <div class="proof-icon">ðŸ’¬</div>
+        <h3>Open Roadmap</h3>
+        <p>Features get built based on what the community needs. Not what a product manager thinks you need.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="section" id="pricing">
+  <div class="section-inner section-center">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title reveal">Simple pricing.<br>No gotchas.</h2>
+    <p class="section-sub reveal">Start free. Upgrade when you're ready. The lifetime deal won't last forever.</p>
+
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="price-card reveal">
+        <div class="price-name">Free</div>
+        <div class="price-amount">$0<span>/forever</span></div>
+        <div class="price-desc">Perfect for getting started. No credit card needed.</div>
+        <ul class="price-features">
+          <li>5 active invoices</li>
+          <li>Copy-paste follow-up emails</li>
+          <li>3-tier email templates</li>
+          <li>Auto late fee calculator</li>
+          <li>Dashboard overview</li>
+          <li>Data export (JSON)</li>
+          <li>Dark & light mode</li>
+        </ul>
+        <a href="/app" class="btn btn-secondary btn-lg">Start Free â†’</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="price-card popular reveal reveal-delay-1">
+        <div class="price-badge blue">Most Popular</div>
+        <div class="price-name">Pro</div>
+        <div class="price-amount">$5<span>/month</span></div>
+        <div class="price-desc">For freelancers serious about getting paid on time.</div>
+        <ul class="price-features">
+          <li>Unlimited invoices</li>
+          <li>Auto-send email sequences</li>
+          <li>Send from your own email</li>
+          <li>Payment analytics</li>
+          <li>Priority support</li>
+          <li>Early access to new features</li>
+          <li>Everything in Free</li>
+        </ul>
+        <a href="https://buy.stripe.com/00w4gsgKzd5EaxlefZcV20q" class="btn btn-primary btn-lg">Go Pro â†’</a>
+      </div>
+
+      <!-- Lifetime -->
+      <div class="price-card lifetime reveal reveal-delay-2">
+        <div class="price-badge orange">ðŸ”¥ Limited</div>
+        <div class="price-name">Lifetime Pro</div>
+        <div class="price-amount">$49 <span class="price-original">$60/yr</span></div>
+        <div class="price-desc">One payment. Pro forever. First 200 members only.</div>
+        <ul class="price-features">
+          <li>Everything in Pro â€” forever</li>
+          <li>Never pay again</li>
+          <li>Founding member status</li>
+          <li>Vote on feature roadmap</li>
+          <li>Exclusive community access</li>
+          <li>All future features included</li>
+          <li>Locked-in price guarantee</li>
+        </ul>
+        <a href="https://buy.stripe.com/dRmfZaeCr4z88pd1tdcV20p" class="btn btn-lifetime btn-lg">Get Lifetime Access â†’</a>
+        <div class="spots-left">
+          ðŸ”¥ <span id="spotsLeft">147</span> of 200 spots remaining
+          <div class="spots-bar"><div class="spots-bar-fill" id="spotsBar" style="width: 26.5%;"></div></div>
+        </div>
+        <div style="text-align:center;margin-top:0.6rem;">
+          <div class="countdown" id="countdown"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section-alt" id="faq">
+  <div class="section-inner section-center">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title reveal">Questions? Answers.</h2>
+
+    <div class="faq-list">
+      <div class="faq-item reveal" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Is PaidUp really free?
+          <span class="faq-chevron">â–¼</span>
+        </div>
+        <div class="faq-a">
+          Yes, genuinely. The free plan gives you 5 active invoices, all three email tiers, late fee calculation, and the full dashboard. No credit card. No trial that expires. Free means free. We make money from Pro users who need unlimited invoices and auto-send.
+        </div>
+      </div>
+
+      <div class="faq-item reveal" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Where is my data stored?
+          <span class="faq-chevron">â–¼</span>
+        </div>
+        <div class="faq-a">
+          Right in your browser's local storage. Your invoice data never leaves your device on the free plan â€” we don't have servers storing your financial information. You can export everything as a JSON file anytime. Pro auto-send features use encrypted transmission but never store your email credentials.
+        </div>
+      </div>
+
+      <div class="faq-item reveal" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Can I cancel Pro anytime?
+          <span class="faq-chevron">â–¼</span>
+        </div>
+        <div class="faq-a">
+          Absolutely. Cancel with one click from your account, no questions asked. You'll keep Pro access until the end of your billing period. Lifetime plan holders never need to cancel â€” it's yours forever.
+        </div>
+      </div>
+
+      <div class="faq-item reveal" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Does PaidUp actually send the emails for me?
+          <span class="faq-chevron">â–¼</span>
+        </div>
+        <div class="faq-a">
+          On the free plan, PaidUp generates the emails and you copy-paste them into your own email client. On Pro, you can connect your email and PaidUp will auto-send escalating follow-ups on a schedule you set. The emails come from your address, not ours â€” so it looks professional and personal.
+        </div>
+      </div>
+
+      <div class="faq-item reveal" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          What's the Lifetime deal about? Is it real?
+          <span class="faq-chevron">â–¼</span>
+        </div>
+        <div class="faq-a">
+          100% real. We're offering the first 200 users lifetime Pro access for a one-time $49 payment. No subscriptions, no renewals. You get every Pro feature forever, including all future updates. When the 200 spots are gone, they're gone â€” the price goes to $5/month. We're doing this to build a community of founding members who help shape the product.
+        </div>
+      </div>
+
+      <div class="faq-item reveal" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          Can I customize the email templates?
+          <span class="faq-chevron">â–¼</span>
+        </div>
+        <div class="faq-a">
+          Right now, PaidUp auto-personalizes templates with your invoice details (client name, amount, days overdue, late fees). Full template customization is on the roadmap â€” and as a founding member, you get a direct say in what we build next. The current templates are based on what actually works to get paid, based on real-world follow-up strategies.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <h2 class="reveal">Stop leaving money on the table.</h2>
+    <p class="reveal reveal-delay-1">
+      The average freelancer is owed <strong style="color:var(--orange);">$17,600</strong> in outstanding invoices right now. Every day you don't follow up is a day you're working for free. PaidUp makes getting paid as easy as sending an email.
+    </p>
+    <div class="hero-ctas reveal reveal-delay-2">
+      <a href="/app" class="btn btn-primary btn-xl">Start Getting Paid â€” Free â†’</a>
+      <a href="https://buy.stripe.com/dRmfZaeCr4z88pd1tdcV20p" class="btn btn-lifetime btn-lg">ðŸ”¥ Get Lifetime Pro â€” $49</a>
+    </div>
+    <p class="reveal reveal-delay-3" style="margin-top:1.5rem;font-size:0.85rem;color:var(--text-muted);">
+      No credit card required Â· Free forever plan Â· <span id="spotsLeft2">147</span> lifetime spots left
+    </p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">ðŸ’° PaidUp</div>
+      <div class="footer-copy">Â© 2025 PaidUp. Built for freelancers who'd rather create than collect.</div>
+    </div>
+    <div class="footer-links">
+      <a href="/app">App</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="mailto:hello@paid-up.com">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ==================== NAV ====================
+const nav = document.getElementById('nav');
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+hamburger.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
+  hamburger.textContent = navLinks.classList.contains('open') ? 'âœ•' : 'â˜°';
+});
+
+// Close mobile nav on link click
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    hamburger.textContent = 'â˜°';
+  });
+});
+
+// ==================== SCROLL REVEAL ====================
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ==================== FAQ TOGGLE ====================
+function toggleFaq(item) {
+  const wasOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  // Toggle clicked
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ==================== EMAIL TONE SWITCH ====================
+const emailData = {
+  gentle: {
+    subject: 'Subject: Quick reminder â€” Invoice INV-2025-042',
+    body: `Hi Sarah,
+
+Hope you're doing well! Just a quick heads up â€” invoice INV-2025-042 for $4,500.00 was due on Jun 15, 2025, and it looks like it's still open. It's now 15 days past due.
+
+Totally understand things get busy â€” just wanted to make sure it didn't slip through the cracks.
+
+Would you mind taking a look when you get a moment?
+
+Thanks so much,
+[Your Name]`
+  },
+  firm: {
+    subject: 'Subject: Follow-up: Invoice INV-2025-042 â€” 15 days overdue',
+    body: `Hi Sarah,
+
+I'm following up regarding invoice INV-2025-042 for $4,500.00, which was due on Jun 15, 2025. As of today, it is 15 days overdue.
+
+Per our agreement, a late fee of 1.5% per month applies to overdue balances. The current late fee is $33.75, bringing the total outstanding to $4,533.75.
+
+I'd appreciate it if we could get this resolved soon. If there's an issue with the invoice or you need to discuss payment arrangements, I'm happy to work something out.
+
+Could you provide an update on when I can expect payment?
+
+Best regards,
+[Your Name]`
+  },
+  final: {
+    subject: 'Subject: FINAL NOTICE: Invoice INV-2025-042 â€” Immediate payment required',
+    body: `Dear Sarah,
+
+This is a final notice regarding the outstanding balance on invoice INV-2025-042.
+
+The original amount of $4,500.00 was due on Jun 15, 2025 and is now 15 days past due. With applicable late fees of $33.75, the total balance owed is $4,533.75.
+
+Despite previous reminders, this invoice remains unpaid. I need to receive payment within 7 business days of this notice.
+
+If payment is not received by that date, I will have no choice but to explore other options to recover the amount owed, which may include engaging a collections agency.
+
+If there are circumstances I should be aware of, please contact me immediately.
+
+Regards,
+[Your Name]`
+  }
+};
+
+function switchTone(tone, el) {
+  document.querySelectorAll('.tone-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('emailSubject').textContent = emailData[tone].subject;
+  document.getElementById('emailBody').textContent = emailData[tone].body;
+}
+
+// ==================== COUNTDOWN ====================
+function initCountdown() {
+  const container = document.getElementById('countdown');
+  // Set deadline to 3 days from now (rolling)
+  const deadline = new Date();
+  deadline.setDate(deadline.getDate() + 3);
+  deadline.setHours(23, 59, 59, 0);
+
+  // Try to load saved deadline
+  const savedDeadline = localStorage.getItem('paidup_countdown_deadline');
+  let target;
+  if (savedDeadline) {
+    target = new Date(savedDeadline);
+    if (target < new Date()) {
+      // Reset if expired
+      target = deadline;
+      localStorage.setItem('paidup_countdown_deadline', deadline.toISOString());
+    }
+  } else {
+    target = deadline;
+    localStorage.setItem('paidup_countdown_deadline', deadline.toISOString());
+  }
+
+  function update() {
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      container.innerHTML = '<span style="color:var(--red);font-weight:700;font-size:0.9rem;">Offer expired!</span>';
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    container.innerHTML = [
+      { val: d, label: 'Days' },
+      { val: h, label: 'Hours' },
+      { val: m, label: 'Min' },
+      { val: s, label: 'Sec' }
+    ].map(u => `
+      <div class="countdown-unit">
+        <span class="countdown-num">${String(u.val).padStart(2, '0')}</span>
+        <span class="countdown-label">${u.label}</span>
+      </div>
+    `).join('');
+  }
+
+  update();
+  setInterval(update, 1000);
+}
+
+initCountdown();
+
+// ==================== SPOTS SYNC ====================
+// Sync spots across the page
+function syncSpots() {
+  const spots = document.getElementById('spotsLeft');
+  const spots2 = document.getElementById('spotsLeft2');
+  if (spots && spots2) {
+    spots2.textContent = spots.textContent;
+  }
+}
+syncSpots();
+
+// ==================== SMOOTH SCROLL ====================
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const href = this.getAttribute('href');
+    if (href === '#' || href.includes('stripe')) return;
+    e.preventDefault();
+    const target = document.querySelector(href);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
+
