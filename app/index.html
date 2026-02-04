@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PaidUp — Never Chase an Invoice Again</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src https://mnlhidqhujbwwedtqvwb.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
+<title>PaidUp &#8212; Never Chase an Invoice Again</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -116,27 +117,28 @@ body {
   white-space: nowrap;
   font-family: inherit;
 }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
 .btn-primary {
   background: var(--accent);
   color: #fff;
 }
-.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
 .btn-secondary {
   background: var(--bg-input);
   color: var(--text-primary);
   border: 1px solid var(--border);
 }
-.btn-secondary:hover { background: var(--bg-hover); border-color: var(--border-light); }
+.btn-secondary:hover:not(:disabled) { background: var(--bg-hover); border-color: var(--border-light); }
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
   padding: 0.4rem 0.6rem;
 }
-.btn-ghost:hover { color: var(--text-primary); background: var(--bg-hover); }
+.btn-ghost:hover:not(:disabled) { color: var(--text-primary); background: var(--bg-hover); }
 .btn-danger { background: var(--status-critical); color: #fff; }
-.btn-danger:hover { background: #dc2626; }
+.btn-danger:hover:not(:disabled) { background: #dc2626; }
 .btn-success { background: var(--status-paid); color: #fff; }
-.btn-success:hover { background: #16a34a; }
+.btn-success:hover:not(:disabled) { background: #16a34a; }
 .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
 .btn-icon { padding: 0.5rem; font-size: 1.1rem; }
 
@@ -547,6 +549,105 @@ body {
 /* Import hidden input */
 #importInput { display: none; }
 
+/* Auth Overlay */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+.auth-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.auth-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--shadow);
+}
+.auth-brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.auth-brand h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+.auth-brand p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.auth-form { display: flex; flex-direction: column; gap: 1rem; }
+.auth-form .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.auth-form .form-input { padding: 0.7rem 0.9rem; font-size: 0.95rem; }
+.auth-error {
+  background: var(--status-critical-bg);
+  color: var(--status-critical);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: none;
+}
+.auth-error.show { display: block; }
+.auth-info {
+  background: var(--accent-glow);
+  color: var(--accent);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: none;
+}
+.auth-info.show { display: block; }
+.auth-toggle {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.auth-toggle a {
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-toggle a:hover { text-decoration: underline; }
+.auth-theme-toggle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+/* Loading spinner for table */
+.loading-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+.loading-state .spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-bottom: 0.8rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* Responsive */
 @media (max-width: 768px) {
   .brand .tagline { display: none; }
@@ -557,6 +658,7 @@ body {
   .form-grid { grid-template-columns: 1fr; }
   .section-header { flex-direction: column; align-items: flex-start; }
   .data-bar { width: 100%; }
+  .auth-box { margin: 1rem; padding: 2rem 1.5rem; }
 }
 @media (max-width: 480px) {
   .stats-row { grid-template-columns: 1fr; }
@@ -586,20 +688,57 @@ body {
 </head>
 <body>
 
+<!-- Auth Overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-theme-toggle">
+    <label class="theme-toggle-label">
+      <span>&#9728;&#65039;</span>
+      <div class="theme-toggle" id="authThemeToggle" role="button" tabindex="0" aria-label="Toggle theme"></div>
+      <span>&#127769;</span>
+    </label>
+  </div>
+  <div class="auth-box animate-in">
+    <div class="auth-brand">
+      <h1>&#128176; PaidUp</h1>
+      <p>Never chase an invoice again.</p>
+    </div>
+    <form class="auth-form" id="authForm" onsubmit="handleAuth(event)">
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-info" id="authInfo"></div>
+      <div class="form-group">
+        <label class="form-label" for="authEmail">Email</label>
+        <input class="form-input" type="email" id="authEmail" required placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="authPassword">Password</label>
+        <input class="form-input" type="password" id="authPassword" required placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" minlength="6" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" id="authSubmitBtn" style="width:100%;justify-content:center;padding:0.7rem;">
+        <span id="authSubmitText">Log In</span>
+      </button>
+    </form>
+    <div class="auth-toggle">
+      <span id="authToggleText">Don&#8217;t have an account?</span>
+      <a id="authToggleLink" onclick="toggleAuthMode()">Sign Up</a>
+    </div>
+  </div>
+</div>
+
 <!-- Header -->
 <header class="header">
   <div class="header-inner">
     <div class="brand">
-      <h1>💰 PaidUp</h1>
+      <h1>&#128176; PaidUp</h1>
       <span class="tagline">Never chase an invoice again.</span>
     </div>
     <div class="header-actions">
       <label class="theme-toggle-label">
-        <span>☀️</span>
+        <span>&#9728;&#65039;</span>
         <div class="theme-toggle" id="themeToggle" role="button" tabindex="0" aria-label="Toggle theme"></div>
-        <span>🌙</span>
+        <span>&#127769;</span>
       </label>
-      <button class="btn btn-primary btn-sm" onclick="toggleForm()">➕ New Invoice</button>
+      <button class="btn btn-primary btn-sm" onclick="toggleForm()">&#10133; New Invoice</button>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()" id="logoutBtn" title="Log out">&#128682; Logout</button>
     </div>
   </div>
 </header>
@@ -628,8 +767,8 @@ body {
   <!-- Add Invoice Form -->
   <div class="section" id="formSection" style="display:none;">
     <div class="section-header">
-      <div class="section-title">📝 Add New Invoice</div>
-      <button class="btn btn-ghost btn-sm" onclick="toggleForm()">✕ Close</button>
+      <div class="section-title">&#128221; Add New Invoice</div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleForm()">&#10005; Close</button>
     </div>
     <div class="section-body">
       <form id="invoiceForm" onsubmit="handleSubmit(event)">
@@ -665,7 +804,7 @@ body {
           </div>
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" onclick="toggleForm()">Cancel</button>
-            <button type="submit" class="btn btn-primary">💾 Save Invoice</button>
+            <button type="submit" class="btn btn-primary" id="saveInvoiceBtn">&#128190; Save Invoice</button>
           </div>
         </div>
       </form>
@@ -675,7 +814,7 @@ body {
   <!-- Invoice Dashboard -->
   <div class="section">
     <div class="section-header">
-      <div class="section-title">📊 Invoice Dashboard</div>
+      <div class="section-title">&#128202; Invoice Dashboard</div>
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
         <div class="filter-bar" id="filterBar">
           <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
@@ -685,10 +824,10 @@ body {
           <button class="filter-btn" data-filter="paid" onclick="setFilter('paid',this)">Paid</button>
         </div>
         <div class="data-bar">
-          <button class="btn btn-secondary btn-sm" onclick="exportData()">📤 Export</button>
-          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importInput').click()">📥 Import</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportData()">&#128228; Export</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importInput').click()">&#128229; Import</button>
           <input type="file" id="importInput" accept=".json" onchange="importData(event)">
-          <button class="btn btn-ghost btn-sm" onclick="clearDemoData()" id="clearDemoBtn" style="display:none;">🧹 Clear Demo</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearDemoData()" id="clearDemoBtn" style="display:none;">&#129529; Clear Demo</button>
         </div>
       </div>
     </div>
@@ -713,8 +852,13 @@ body {
       </div>
       <!-- Mobile Cards -->
       <div class="mobile-cards" id="mobileCards" style="padding:1rem;"></div>
+      <!-- Loading State -->
+      <div id="loadingState" class="loading-state" style="display:none;">
+        <div class="spinner"></div>
+        <p>Loading invoices...</p>
+      </div>
       <div id="emptyState" class="empty-state" style="display:none;">
-        <div class="icon">📭</div>
+        <div class="icon">&#128237;</div>
         <p>No invoices yet. Add your first one!</p>
       </div>
     </div>
@@ -723,15 +867,15 @@ body {
 
 <!-- Footer -->
 <footer class="footer">
-  Built for freelancers who'd rather create than collect. ✨
+  Built for freelancers who&#8217;d rather create than collect. &#10024;
 </footer>
 
 <!-- Email Modal -->
 <div class="modal-overlay" id="emailModal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">✉️ Follow-Up Emails</div>
-      <button class="modal-close" onclick="closeEmailModal()">×</button>
+      <div class="modal-title">&#9993;&#65039; Follow-Up Emails</div>
+      <button class="modal-close" onclick="closeEmailModal()">&times;</button>
     </div>
     <div class="modal-body" id="emailModalBody"></div>
   </div>
@@ -741,16 +885,16 @@ body {
 <div class="modal-overlay" id="paidModal">
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
-      <div class="modal-title">✅ Mark as Paid</div>
-      <button class="modal-close" onclick="closePaidModal()">×</button>
+      <div class="modal-title">&#9989; Mark as Paid</div>
+      <button class="modal-close" onclick="closePaidModal()">&times;</button>
     </div>
     <div class="modal-body">
       <div class="paid-date-group">
-        <label>Payment received on:</label>
+        <label for="paidDateInput">Payment received on:</label>
         <input type="date" class="form-input" id="paidDateInput">
         <div class="paid-date-actions">
           <button class="btn btn-secondary btn-sm" onclick="closePaidModal()">Cancel</button>
-          <button class="btn btn-success btn-sm" onclick="confirmPaid()">✅ Confirm Paid</button>
+          <button class="btn btn-success btn-sm" id="confirmPaidBtn" onclick="confirmPaid()">&#9989; Confirm Paid</button>
         </div>
       </div>
     </div>
@@ -760,21 +904,179 @@ body {
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- Supabase SDK (pinned version) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+
 <script>
+// ==================== SUPABASE INIT ====================
+const SUPABASE_URL = 'https://mnlhidqhujbwwedtqvwb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ubGhpZHFodWpid3dlZHRxdndiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMTQ4NTgsImV4cCI6MjA4NTc5MDg1OH0.5ZDeVsxf0gDmyjyuxoMQhuHrPMHoaDDFYNkWXzGrZOY';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ==================== DB MAPPING ====================
+function toDb(inv) {
+  const row = {};
+  if (inv.clientName !== undefined) row.client_name = inv.clientName;
+  if (inv.clientEmail !== undefined) row.client_email = inv.clientEmail;
+  if (inv.invoiceNumber !== undefined) row.invoice_number = inv.invoiceNumber;
+  if (inv.amount !== undefined) row.amount = inv.amount;
+  if (inv.dateSent !== undefined) row.date_sent = inv.dateSent;
+  if (inv.dueDate !== undefined) row.due_date = inv.dueDate;
+  if (inv.lateFeeRate !== undefined) row.late_fee_rate = inv.lateFeeRate;
+  if (inv.paid !== undefined) row.paid = inv.paid;
+  if (inv.paidDate !== undefined) row.paid_date = inv.paidDate;
+  if (inv.isDemo !== undefined) row.is_demo = inv.isDemo;
+  if (inv.userId !== undefined) row.user_id = inv.userId;
+  return row;
+}
+
+function fromDb(row) {
+  return {
+    id: row.id,
+    clientName: row.client_name,
+    clientEmail: row.client_email || '',
+    invoiceNumber: row.invoice_number || '',
+    amount: parseFloat(row.amount) || 0,
+    dateSent: row.date_sent,
+    dueDate: row.due_date,
+    lateFeeRate: parseFloat(row.late_fee_rate) || 1.5,
+    paid: !!row.paid,
+    paidDate: row.paid_date || null,
+    isDemo: !!row.is_demo,
+    userId: row.user_id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
 // ==================== STATE ====================
-const STORAGE_KEY = 'paidup_invoices';
 const DEMO_KEY = 'paidup_has_demo';
 let invoices = [];
 let currentFilter = 'all';
 let pendingPaidId = null;
+let currentUser = null;
+let authMode = 'login'; // 'login' or 'signup'
+let currentEmailTemplates = []; // [Fix 11] Module-scoped email template storage
+
+// ==================== OPTIMIZED HELPERS ====================
+// [Fix 12] Create the div once at module scope and reuse
+const _escDiv = document.createElement('div');
+function esc(str) {
+  _escDiv.textContent = str || '';
+  return _escDiv.innerHTML;
+}
 
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
   loadTheme();
-  loadInvoices();
   setDefaultDates();
-  render();
+  initAuth();
 });
+
+// ==================== AUTH ====================
+function initAuth() {
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (session && session.user) {
+      currentUser = session.user;
+      document.getElementById('authOverlay').classList.add('hidden');
+      showLoadingState(true);
+      await loadInvoices();
+      render();
+      showLoadingState(false);
+    } else {
+      currentUser = null;
+      invoices = [];
+      render();
+      document.getElementById('authOverlay').classList.remove('hidden');
+    }
+  });
+}
+
+function toggleAuthMode() {
+  if (authMode === 'login') {
+    authMode = 'signup';
+    document.getElementById('authSubmitText').textContent = 'Sign Up';
+    document.getElementById('authToggleText').textContent = 'Already have an account? ';
+    document.getElementById('authToggleLink').textContent = 'Log In';
+  } else {
+    authMode = 'login';
+    document.getElementById('authSubmitText').textContent = 'Log In';
+    document.getElementById('authToggleText').textContent = "Don\u2019t have an account? ";
+    document.getElementById('authToggleLink').textContent = 'Sign Up';
+  }
+  hideAuthError();
+  hideAuthInfo();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function hideAuthError() {
+  document.getElementById('authError').classList.remove('show');
+}
+
+// [Fix 4] Info-styled message for non-error auth feedback (e.g. email confirmation)
+function showAuthInfo(msg) {
+  const el = document.getElementById('authInfo');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function hideAuthInfo() {
+  document.getElementById('authInfo').classList.remove('show');
+}
+
+async function handleAuth(e) {
+  e.preventDefault();
+  hideAuthError();
+  hideAuthInfo();
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const btn = document.getElementById('authSubmitBtn');
+  const btnText = document.getElementById('authSubmitText');
+  const origText = btnText.textContent;
+
+  btn.disabled = true;
+  btnText.textContent = authMode === 'login' ? 'Logging in...' : 'Signing up...';
+
+  try {
+    let result;
+    if (authMode === 'signup') {
+      result = await supabase.auth.signUp({ email, password });
+    } else {
+      result = await supabase.auth.signInWithPassword({ email, password });
+    }
+
+    if (result.error) {
+      showAuthError(result.error.message);
+    } else if (authMode === 'signup' && result.data.user && !result.data.session) {
+      // [Fix 4] Show info-styled message instead of error for email confirmation
+      showAuthInfo('Check your email to confirm your account.');
+    }
+  } catch (err) {
+    showAuthError('Something went wrong. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = origText;
+  }
+}
+
+// [Fix 3] Wrapped signOut in try/catch — fail-safe clears local state regardless
+async function handleLogout() {
+  try {
+    await supabase.auth.signOut();
+  } catch (err) {
+    showToast('Logout error: ' + (err.message || 'Unknown error'), 'error');
+  }
+  // Fail-safe: always clear local state and show auth overlay
+  currentUser = null;
+  invoices = [];
+  render();
+  document.getElementById('authOverlay').classList.remove('hidden');
+}
 
 // ==================== THEME ====================
 function loadTheme() {
@@ -782,42 +1084,68 @@ function loadTheme() {
   if (saved) document.documentElement.setAttribute('data-theme', saved);
 }
 
-document.getElementById('themeToggle').addEventListener('click', () => {
+function doToggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('paidup_theme', next);
-});
+}
 
-// ==================== DATA ====================
-function loadInvoices() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) throw new Error();
-      invoices = parsed;
-    } catch {
-      invoices = [];
-      showToast('Saved data was corrupted. Starting fresh.', 'error');
-    }
-  } else {
-    loadDemoData();
+document.getElementById('themeToggle').addEventListener('click', doToggleTheme);
+document.getElementById('authThemeToggle').addEventListener('click', doToggleTheme);
+
+// [Fix 8] Keyboard accessibility for theme toggles (Enter and Space)
+function handleThemeKeydown(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    doToggleTheme();
+  }
+}
+document.getElementById('themeToggle').addEventListener('keydown', handleThemeKeydown);
+document.getElementById('authThemeToggle').addEventListener('keydown', handleThemeKeydown);
+
+// ==================== LOADING STATE ====================
+function showLoadingState(show) {
+  document.getElementById('loadingState').style.display = show ? 'block' : 'none';
+  if (show) {
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('invoiceTableBody').innerHTML = '';
+    document.getElementById('mobileCards').innerHTML = '';
   }
 }
 
-function saveInvoices() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(invoices));
+// ==================== DATA ====================
+async function loadInvoices() {
+  try {
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('user_id', currentUser.id) // [Fix 10] Defense-in-depth user_id filter
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    invoices = (data || []).map(fromDb);
+
+    // If no invoices at all and no demo loaded before, auto-load demo
+    if (invoices.length === 0 && !localStorage.getItem(DEMO_KEY)) {
+      await loadDemoData();
+    }
+  } catch (err) {
+    showToast('Failed to load invoices: ' + err.message, 'error');
+    invoices = [];
+  }
 }
 
-function loadDemoData() {
+// [Fix 1] Refactored to use toDb() instead of manual snake_case construction
+async function loadDemoData() {
+  if (!currentUser) return;
   const today = new Date();
   const daysAgo = (n) => {
     const d = new Date(today); d.setDate(d.getDate() - n); return d.toISOString().split('T')[0];
   };
-  invoices = [
-    {
-      id: generateId(),
+
+  const demoInvoices = [
+    toDb({
       clientName: 'Meridian Studios',
       clientEmail: 'accounts@meridianstudios.com',
       invoiceNumber: 'INV-2025-042',
@@ -827,10 +1155,10 @@ function loadDemoData() {
       lateFeeRate: 1.5,
       paid: false,
       paidDate: null,
-      isDemo: true
-    },
-    {
-      id: generateId(),
+      isDemo: true,
+      userId: currentUser.id
+    }),
+    toDb({
       clientName: 'Brightpath Consulting',
       clientEmail: 'payments@brightpath.io',
       invoiceNumber: 'INV-2025-039',
@@ -840,10 +1168,10 @@ function loadDemoData() {
       lateFeeRate: 1.5,
       paid: false,
       paidDate: null,
-      isDemo: true
-    },
-    {
-      id: generateId(),
+      isDemo: true,
+      userId: currentUser.id
+    }),
+    toDb({
       clientName: 'Luna Creative Co.',
       clientEmail: 'hello@lunacreative.co',
       invoiceNumber: 'INV-2025-044',
@@ -853,10 +1181,10 @@ function loadDemoData() {
       lateFeeRate: 1.5,
       paid: false,
       paidDate: null,
-      isDemo: true
-    },
-    {
-      id: generateId(),
+      isDemo: true,
+      userId: currentUser.id
+    }),
+    toDb({
       clientName: 'Apex Digital',
       clientEmail: 'finance@apexdigital.com',
       invoiceNumber: 'INV-2025-035',
@@ -866,51 +1194,121 @@ function loadDemoData() {
       lateFeeRate: 2.0,
       paid: true,
       paidDate: daysAgo(5),
-      isDemo: true
-    }
+      isDemo: true,
+      userId: currentUser.id
+    })
   ];
-  localStorage.setItem(DEMO_KEY, 'true');
-  saveInvoices();
+
+  try {
+    const { data, error } = await supabase
+      .from('invoices')
+      .insert(demoInvoices)
+      .select();
+
+    if (error) throw error;
+    invoices = (data || []).map(fromDb);
+    localStorage.setItem(DEMO_KEY, 'true');
+  } catch (err) {
+    showToast('Failed to load demo data: ' + err.message, 'error');
+  }
 }
 
-function clearDemoData() {
-  invoices = invoices.filter(inv => !inv.isDemo);
-  localStorage.removeItem(DEMO_KEY);
-  saveInvoices();
-  render();
-  showToast('Demo data cleared!', 'info');
+async function clearDemoData() {
+  if (!currentUser) return;
+  const btn = document.getElementById('clearDemoBtn');
+  btn.disabled = true;
+  btn.textContent = 'Clearing...';
+
+  try {
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('is_demo', true)
+      .eq('user_id', currentUser.id); // [Fix 10] Defense-in-depth user_id filter
+
+    if (error) throw error;
+    invoices = invoices.filter(inv => !inv.isDemo);
+    localStorage.removeItem(DEMO_KEY);
+    render();
+    showToast('Demo data cleared!', 'info');
+  } catch (err) {
+    showToast('Failed to clear demo data: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '\uD83E\uDDF9 Clear Demo';
+  }
 }
 
+// [Fix 9] Strip internal fields before export
 function exportData() {
-  const blob = new Blob([JSON.stringify(invoices, null, 2)], { type: 'application/json' });
+  const cleaned = invoices.map(function(inv) {
+    const { userId, createdAt, updatedAt, isDemo, id, ...rest } = inv;
+    return rest;
+  });
+  const blob = new Blob([JSON.stringify(cleaned, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `paidup-export-${new Date().toISOString().split('T')[0]}.json`;
+  a.download = 'paidup-export-' + new Date().toISOString().split('T')[0] + '.json';
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   showToast('Data exported!', 'success');
 }
 
-function importData(event) {
+// [Fix 1] Refactored to use toDb()
+// [Fix 7] Added import validation: amount > 0, date format, lateFeeRate clamp, hard-coded isDemo: false
+async function importData(event) {
   const file = event.target.files[0];
-  if (!file) return;
+  if (!file || !currentUser) return;
+
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     try {
       const data = JSON.parse(e.target.result);
       if (!Array.isArray(data)) throw new Error('Invalid format');
-      invoices = data.filter(inv => inv && typeof inv.id === 'string'
+
+      const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+      const valid = data.filter(inv => inv
         && typeof inv.clientName === 'string'
         && typeof inv.amount === 'number' && !isNaN(inv.amount)
+        && inv.amount > 0
         && typeof inv.dateSent === 'string'
-        && typeof inv.dueDate === 'string')
-        .map(inv => ({ ...inv, id: inv.id.replace(/[^a-zA-Z0-9_-]/g, '') }));
-      saveInvoices();
+        && dateRe.test(inv.dateSent)
+        && typeof inv.dueDate === 'string'
+        && dateRe.test(inv.dueDate));
+
+      if (valid.length === 0) {
+        showToast('No valid invoices found in file.', 'error');
+        return;
+      }
+
+      const rows = valid.map(inv => toDb({
+        clientName: inv.clientName,
+        clientEmail: inv.clientEmail || '',
+        invoiceNumber: inv.invoiceNumber || '',
+        amount: inv.amount,
+        dateSent: inv.dateSent,
+        dueDate: inv.dueDate,
+        lateFeeRate: Math.min(100, Math.max(0, inv.lateFeeRate || 1.5)),
+        paid: !!inv.paid,
+        paidDate: inv.paidDate || null,
+        isDemo: false,
+        userId: currentUser.id
+      }));
+
+      const { data: inserted, error } = await supabase
+        .from('invoices')
+        .insert(rows)
+        .select();
+
+      if (error) throw error;
+
+      // Reload all invoices to stay in sync
+      await loadInvoices();
       render();
-      showToast(`Imported ${data.length} invoice(s)!`, 'success');
-    } catch {
-      showToast('Invalid file format. Expected JSON array.', 'error');
+      showToast('Imported ' + (inserted ? inserted.length : valid.length) + ' invoice(s)!', 'success');
+    } catch (err) {
+      showToast('Import failed: ' + (err.message || 'Invalid file format.'), 'error');
     }
   };
   reader.readAsText(file);
@@ -918,14 +1316,12 @@ function importData(event) {
 }
 
 // ==================== HELPERS ====================
-function generateId() { return 'inv_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-
 function formatCurrency(amount) {
   return '$' + Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return '—';
+  if (!dateStr) return '\u2014';
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
@@ -973,8 +1369,15 @@ function toggleForm() {
   }
 }
 
-function handleSubmit(e) {
+// [Fix 1] Refactored to use toDb() instead of manual snake_case construction
+async function handleSubmit(e) {
   e.preventDefault();
+  if (!currentUser) return;
+
+  const btn = document.getElementById('saveInvoiceBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
   const dateSent = document.getElementById('dateSent').value;
   let dueDate = document.getElementById('dueDate').value;
 
@@ -984,8 +1387,7 @@ function handleSubmit(e) {
     dueDate = sent.toISOString().split('T')[0];
   }
 
-  const invoice = {
-    id: generateId(),
+  const invoiceData = {
     clientName: document.getElementById('clientName').value.trim(),
     clientEmail: document.getElementById('clientEmail').value.trim(),
     invoiceNumber: document.getElementById('invoiceNumber').value.trim(),
@@ -995,17 +1397,36 @@ function handleSubmit(e) {
     lateFeeRate: parseFloat(document.getElementById('lateFeeRate').value) || 1.5,
     paid: false,
     paidDate: null,
-    isDemo: false
+    isDemo: false,
+    userId: currentUser.id
   };
 
-  invoices.unshift(invoice);
-  saveInvoices();
-  render();
-  document.getElementById('invoiceForm').reset();
-  setDefaultDates();
-  document.getElementById('lateFeeRate').value = '1.5';
-  toggleForm();
-  showToast(`Invoice ${invoice.invoiceNumber} added!`, 'success');
+  const row = toDb(invoiceData);
+
+  try {
+    const { data, error } = await supabase
+      .from('invoices')
+      .insert([row])
+      .select();
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      invoices.unshift(fromDb(data[0]));
+    }
+
+    render();
+    document.getElementById('invoiceForm').reset();
+    setDefaultDates();
+    document.getElementById('lateFeeRate').value = '1.5';
+    toggleForm();
+    showToast('Invoice ' + invoiceData.invoiceNumber + ' added!', 'success');
+  } catch (err) {
+    showToast('Failed to save invoice: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '\uD83D\uDCBE Save Invoice';
+  }
 }
 
 // ==================== RENDER ====================
@@ -1039,6 +1460,7 @@ function renderStats() {
   document.getElementById('statLateFees').textContent = formatCurrency(totalLateFees);
 }
 
+// [Fix 2] Delete button passes `this` for disable-during-async
 function renderTable() {
   const tbody = document.getElementById('invoiceTableBody');
   const filtered = getFilteredInvoices();
@@ -1057,31 +1479,32 @@ function renderTable() {
     const lateFee = inv.paid ? 0 : calcLateFee(inv.amount, inv.lateFeeRate, inv.dueDate);
     const paidClass = inv.paid ? 'paid-row' : '';
 
-    return `<tr class="${paidClass}">
-      <td>
-        <div style="font-weight:600;">${esc(inv.clientName)}</div>
-        <div style="font-size:0.75rem;color:var(--text-muted);">${esc(inv.clientEmail)}</div>
-      </td>
-      <td style="font-weight:600;font-family:monospace;">${esc(inv.invoiceNumber)}</td>
-      <td style="font-weight:700;">${formatCurrency(inv.amount)}</td>
-      <td>${formatDate(inv.dateSent)}</td>
-      <td>${formatDate(inv.dueDate)}</td>
-      <td><span class="badge badge-${status}">${getStatusLabel(status)}</span></td>
-      <td style="color:${lateFee > 0 ? 'var(--status-critical)' : 'var(--text-muted)'};font-weight:${lateFee > 0 ? '700' : '400'};">
-        ${lateFee > 0 ? formatCurrency(lateFee) : '—'}
-        ${days > 0 && !inv.paid ? `<div style="font-size:0.7rem;color:var(--text-muted);">${days} day${days !== 1 ? 's' : ''} late</div>` : ''}
-      </td>
-      <td>
-        <div class="action-cell">
-          ${!inv.paid && days > 0 ? `<button class="btn btn-primary btn-sm" onclick="openEmailModal('${inv.id}')">✉️ Follow Up</button>` : ''}
-          ${!inv.paid ? `<button class="btn btn-success btn-sm" onclick="openPaidModal('${inv.id}')">✅ Paid</button>` : `<span style="font-size:0.75rem;color:var(--text-muted);">Paid ${formatDate(inv.paidDate)}</span>`}
-          <button class="btn btn-ghost btn-sm" onclick="deleteInvoice('${inv.id}')" title="Delete">🗑️</button>
-        </div>
-      </td>
-    </tr>`;
+    return '<tr class="' + paidClass + '">'
+      + '<td>'
+      + '<div style="font-weight:600;">' + esc(inv.clientName) + '</div>'
+      + '<div style="font-size:0.75rem;color:var(--text-muted);">' + esc(inv.clientEmail) + '</div>'
+      + '</td>'
+      + '<td style="font-weight:600;font-family:monospace;">' + esc(inv.invoiceNumber) + '</td>'
+      + '<td style="font-weight:700;">' + formatCurrency(inv.amount) + '</td>'
+      + '<td>' + formatDate(inv.dateSent) + '</td>'
+      + '<td>' + formatDate(inv.dueDate) + '</td>'
+      + '<td><span class="badge badge-' + status + '">' + getStatusLabel(status) + '</span></td>'
+      + '<td style="color:' + (lateFee > 0 ? 'var(--status-critical)' : 'var(--text-muted)') + ';font-weight:' + (lateFee > 0 ? '700' : '400') + ';">'
+      + (lateFee > 0 ? formatCurrency(lateFee) : '\u2014')
+      + (days > 0 && !inv.paid ? '<div style="font-size:0.7rem;color:var(--text-muted);">' + days + ' day' + (days !== 1 ? 's' : '') + ' late</div>' : '')
+      + '</td>'
+      + '<td>'
+      + '<div class="action-cell">'
+      + (!inv.paid && days > 0 ? '<button class="btn btn-primary btn-sm" onclick="openEmailModal(\'' + inv.id + '\')">&#9993;&#65039; Follow Up</button>' : '')
+      + (!inv.paid ? '<button class="btn btn-success btn-sm" onclick="openPaidModal(\'' + inv.id + '\')">&#9989; Paid</button>' : '<span style="font-size:0.75rem;color:var(--text-muted);">Paid ' + formatDate(inv.paidDate) + '</span>')
+      + '<button class="btn btn-ghost btn-sm" onclick="deleteInvoice(\'' + inv.id + '\', this)" title="Delete">&#128465;&#65039;</button>'
+      + '</div>'
+      + '</td>'
+      + '</tr>';
   }).join('');
 }
 
+// [Fix 2] Delete button passes `this` for disable-during-async
 function renderMobileCards() {
   const container = document.getElementById('mobileCards');
   const filtered = getFilteredInvoices();
@@ -1096,33 +1519,27 @@ function renderMobileCards() {
     const days = getDaysOverdue(inv.dueDate);
     const lateFee = inv.paid ? 0 : calcLateFee(inv.amount, inv.lateFeeRate, inv.dueDate);
 
-    return `<div class="mobile-card" style="${inv.paid ? 'opacity:0.55;' : ''}">
-      <div class="mobile-card-top">
-        <div>
-          <div class="mobile-card-client">${esc(inv.clientName)}</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);">${esc(inv.invoiceNumber)}</div>
-        </div>
-        <span class="badge badge-${status}">${getStatusLabel(status)}</span>
-      </div>
-      <div class="mobile-card-details">
-        <div><div class="mobile-card-label">Amount</div>${formatCurrency(inv.amount)}</div>
-        <div><div class="mobile-card-label">Due</div>${formatDate(inv.dueDate)}</div>
-        <div><div class="mobile-card-label">Late Fees</div>${lateFee > 0 ? formatCurrency(lateFee) : '—'}</div>
-        <div><div class="mobile-card-label">Days Late</div>${days > 0 && !inv.paid ? days : '—'}</div>
-      </div>
-      <div class="mobile-card-actions">
-        ${!inv.paid && days > 0 ? `<button class="btn btn-primary btn-sm" onclick="openEmailModal('${inv.id}')">✉️ Follow Up</button>` : ''}
-        ${!inv.paid ? `<button class="btn btn-success btn-sm" onclick="openPaidModal('${inv.id}')">✅ Paid</button>` : `<span style="font-size:0.75rem;color:var(--text-muted);">Paid ${formatDate(inv.paidDate)}</span>`}
-        <button class="btn btn-ghost btn-sm" onclick="deleteInvoice('${inv.id}')">🗑️</button>
-      </div>
-    </div>`;
+    return '<div class="mobile-card" style="' + (inv.paid ? 'opacity:0.55;' : '') + '">'
+      + '<div class="mobile-card-top">'
+      + '<div>'
+      + '<div class="mobile-card-client">' + esc(inv.clientName) + '</div>'
+      + '<div style="font-size:0.75rem;color:var(--text-muted);">' + esc(inv.invoiceNumber) + '</div>'
+      + '</div>'
+      + '<span class="badge badge-' + status + '">' + getStatusLabel(status) + '</span>'
+      + '</div>'
+      + '<div class="mobile-card-details">'
+      + '<div><div class="mobile-card-label">Amount</div>' + formatCurrency(inv.amount) + '</div>'
+      + '<div><div class="mobile-card-label">Due</div>' + formatDate(inv.dueDate) + '</div>'
+      + '<div><div class="mobile-card-label">Late Fees</div>' + (lateFee > 0 ? formatCurrency(lateFee) : '\u2014') + '</div>'
+      + '<div><div class="mobile-card-label">Days Late</div>' + (days > 0 && !inv.paid ? days : '\u2014') + '</div>'
+      + '</div>'
+      + '<div class="mobile-card-actions">'
+      + (!inv.paid && days > 0 ? '<button class="btn btn-primary btn-sm" onclick="openEmailModal(\'' + inv.id + '\')">&#9993;&#65039; Follow Up</button>' : '')
+      + (!inv.paid ? '<button class="btn btn-success btn-sm" onclick="openPaidModal(\'' + inv.id + '\')">&#9989; Paid</button>' : '<span style="font-size:0.75rem;color:var(--text-muted);">Paid ' + formatDate(inv.paidDate) + '</span>')
+      + '<button class="btn btn-ghost btn-sm" onclick="deleteInvoice(\'' + inv.id + '\', this)">&#128465;&#65039;</button>'
+      + '</div>'
+      + '</div>';
   }).join('');
-}
-
-function esc(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
 }
 
 // ==================== FILTERS ====================
@@ -1135,12 +1552,27 @@ function setFilter(filter, el) {
 }
 
 // ==================== ACTIONS ====================
-function deleteInvoice(id) {
+// [Fix 2] Accepts optional button element, disables during async, re-enables on error
+// [Fix 10] Defense-in-depth user_id filter
+async function deleteInvoice(id, btn) {
   if (!confirm('Delete this invoice?')) return;
-  invoices = invoices.filter(inv => inv.id !== id);
-  saveInvoices();
-  render();
-  showToast('Invoice deleted.', 'info');
+  if (btn) btn.disabled = true;
+
+  try {
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', currentUser.id);
+
+    if (error) throw error;
+    invoices = invoices.filter(inv => inv.id !== id);
+    render();
+    showToast('Invoice deleted.', 'info');
+  } catch (err) {
+    if (btn) btn.disabled = false;
+    showToast('Failed to delete: ' + err.message, 'error');
+  }
 }
 
 function openPaidModal(id) {
@@ -1154,20 +1586,42 @@ function closePaidModal() {
   pendingPaidId = null;
 }
 
-function confirmPaid() {
+// [Fix 5] closePaidModal() moved to success path (not finally) so errors remain visible
+// [Fix 10] Defense-in-depth user_id filter
+async function confirmPaid() {
   if (!pendingPaidId) return;
   const inv = invoices.find(i => i.id === pendingPaidId);
-  if (inv) {
+  if (!inv) { closePaidModal(); return; }
+
+  const btn = document.getElementById('confirmPaidBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const paidDate = document.getElementById('paidDateInput').value || new Date().toISOString().split('T')[0];
+
+  try {
+    const { error } = await supabase
+      .from('invoices')
+      .update({ paid: true, paid_date: paidDate, updated_at: new Date().toISOString() })
+      .eq('id', pendingPaidId)
+      .eq('user_id', currentUser.id);
+
+    if (error) throw error;
     inv.paid = true;
-    inv.paidDate = document.getElementById('paidDateInput').value || new Date().toISOString().split('T')[0];
-    saveInvoices();
+    inv.paidDate = paidDate;
     render();
-    showToast(`${inv.invoiceNumber} marked as paid!`, 'success');
+    showToast(inv.invoiceNumber + ' marked as paid!', 'success');
+    closePaidModal();
+  } catch (err) {
+    showToast('Failed to update: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '\u2705 Confirm Paid';
   }
-  closePaidModal();
 }
 
 // ==================== EMAIL GENERATOR ====================
+// [Fix 11] Uses module-scoped currentEmailTemplates instead of DOM property
 function openEmailModal(id) {
   const inv = invoices.find(i => i.id === id);
   if (!inv) return;
@@ -1182,86 +1636,51 @@ function openEmailModal(id) {
 
   const emails = [
     {
-      tag: '🟡 Gentle Reminder',
+      tag: '\uD83D\uDFE1 Gentle Reminder',
       tagColor: 'var(--status-outstanding)',
-      range: '1–7 days overdue',
-      subject: `Quick reminder — Invoice ${inv.invoiceNumber}`,
-      body: `Hi ${firstName},
-
-Hope you're doing well! Just a quick heads up — invoice ${inv.invoiceNumber} for ${amountStr} was due on ${formatDate(inv.dueDate)}, and it looks like it's still open. It's now ${days} day${days !== 1 ? 's' : ''} past due.
-
-Totally understand things get busy — just wanted to make sure it didn't slip through the cracks. If it's already been sent, feel free to disregard this!
-
-Would you mind taking a look when you get a moment?
-
-Thanks so much,
-[Your Name]`
+      range: '1\u20137 days overdue',
+      subject: 'Quick reminder \u2014 Invoice ' + inv.invoiceNumber,
+      body: 'Hi ' + firstName + ',\n\nHope you\'re doing well! Just a quick heads up \u2014 invoice ' + inv.invoiceNumber + ' for ' + amountStr + ' was due on ' + formatDate(inv.dueDate) + ', and it looks like it\'s still open. It\'s now ' + days + ' day' + (days !== 1 ? 's' : '') + ' past due.\n\nTotally understand things get busy \u2014 just wanted to make sure it didn\'t slip through the cracks. If it\'s already been sent, feel free to disregard this!\n\nWould you mind taking a look when you get a moment?\n\nThanks so much,\n[Your Name]'
     },
     {
-      tag: '🟠 Firm Follow-Up',
+      tag: '\uD83D\uDFE0 Firm Follow-Up',
       tagColor: 'var(--status-overdue)',
-      range: '8–30 days overdue',
-      subject: `Follow-up: Invoice ${inv.invoiceNumber} — ${days} days overdue`,
-      body: `Hi ${firstName},
-
-I'm following up regarding invoice ${inv.invoiceNumber} for ${amountStr}, which was due on ${formatDate(inv.dueDate)}. As of today, it is ${days} days overdue.
-
-Per our agreement, a late fee of ${inv.lateFeeRate}% per month applies to overdue balances. The current late fee is ${lateFeeStr}, bringing the total outstanding to ${totalStr}.
-
-I'd appreciate it if we could get this resolved soon. If there's an issue with the invoice or you need to discuss payment arrangements, I'm happy to work something out — just let me know.
-
-Could you provide an update on when I can expect payment?
-
-Best regards,
-[Your Name]`
+      range: '8\u201330 days overdue',
+      subject: 'Follow-up: Invoice ' + inv.invoiceNumber + ' \u2014 ' + days + ' days overdue',
+      body: 'Hi ' + firstName + ',\n\nI\'m following up regarding invoice ' + inv.invoiceNumber + ' for ' + amountStr + ', which was due on ' + formatDate(inv.dueDate) + '. As of today, it is ' + days + ' days overdue.\n\nPer our agreement, a late fee of ' + inv.lateFeeRate + '% per month applies to overdue balances. The current late fee is ' + lateFeeStr + ', bringing the total outstanding to ' + totalStr + '.\n\nI\'d appreciate it if we could get this resolved soon. If there\'s an issue with the invoice or you need to discuss payment arrangements, I\'m happy to work something out \u2014 just let me know.\n\nCould you provide an update on when I can expect payment?\n\nBest regards,\n[Your Name]'
     },
     {
-      tag: '🔴 Final Notice',
+      tag: '\uD83D\uDD34 Final Notice',
       tagColor: 'var(--status-critical)',
       range: '30+ days overdue',
-      subject: `FINAL NOTICE: Invoice ${inv.invoiceNumber} — Immediate payment required`,
-      body: `Dear ${firstName},
-
-This is a final notice regarding the outstanding balance on invoice ${inv.invoiceNumber}.
-
-The original amount of ${amountStr} was due on ${formatDate(inv.dueDate)} and is now ${days} days past due. With applicable late fees of ${lateFeeStr}, the total balance owed is ${totalStr}.
-
-Despite previous reminders, this invoice remains unpaid. I need to receive payment within 7 business days of this notice.
-
-If payment is not received by that date, I will have no choice but to explore other options to recover the amount owed, which may include engaging a collections agency or pursuing the matter further.
-
-If there are circumstances I should be aware of, please contact me immediately so we can discuss a resolution.
-
-Regards,
-[Your Name]`
+      subject: 'FINAL NOTICE: Invoice ' + inv.invoiceNumber + ' \u2014 Immediate payment required',
+      body: 'Dear ' + firstName + ',\n\nThis is a final notice regarding the outstanding balance on invoice ' + inv.invoiceNumber + '.\n\nThe original amount of ' + amountStr + ' was due on ' + formatDate(inv.dueDate) + ' and is now ' + days + ' days past due. With applicable late fees of ' + lateFeeStr + ', the total balance owed is ' + totalStr + '.\n\nDespite previous reminders, this invoice remains unpaid. I need to receive payment within 7 business days of this notice.\n\nIf payment is not received by that date, I will have no choice but to explore other options to recover the amount owed, which may include engaging a collections agency or pursuing the matter further.\n\nIf there are circumstances I should be aware of, please contact me immediately so we can discuss a resolution.\n\nRegards,\n[Your Name]'
     }
   ];
 
-  const body = document.getElementById('emailModalBody');
-  body.innerHTML = `
-    <div style="margin-bottom:1rem;padding:0.8rem;background:var(--bg-input);border-radius:var(--radius-sm);font-size:0.85rem;">
-      <strong>${esc(inv.clientName)}</strong> · ${esc(inv.invoiceNumber)} · ${amountStr} · ${days} days overdue
-    </div>
-    ${emails.map((em, idx) => `
-      <div class="email-card ${idx === 0 ? 'open' : ''}" id="emailCard${idx}">
-        <div class="email-card-header" onclick="toggleEmailCard(${idx})">
-          <div class="email-card-tag" style="color:${em.tagColor};">${em.tag} <span style="font-weight:400;color:var(--text-muted);font-size:0.75rem;">(${em.range})</span></div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="email-card-body">
-          <div class="email-subject">Subject: ${esc(em.subject)}</div>
-          <div class="email-body-text">${esc(em.body)}</div>
-          <div style="display:flex;align-items:center;">
-            <button class="btn btn-primary btn-sm" onclick="copyEmail(${idx})">📋 Copy to Clipboard</button>
-            <span class="copy-feedback" id="copyFeedback${idx}">✓ Copied!</span>
-          </div>
-        </div>
-      </div>
-    `).join('')}
-  `;
+  currentEmailTemplates = emails;
 
-  // Store email data for copy
-  body._emails = emails;
+  const body = document.getElementById('emailModalBody');
+  body.innerHTML = '<div style="margin-bottom:1rem;padding:0.8rem;background:var(--bg-input);border-radius:var(--radius-sm);font-size:0.85rem;">'
+    + '<strong>' + esc(inv.clientName) + '</strong> \u00B7 ' + esc(inv.invoiceNumber) + ' \u00B7 ' + amountStr + ' \u00B7 ' + days + ' days overdue'
+    + '</div>'
+    + emails.map(function(em, idx) {
+      return '<div class="email-card ' + (idx === 0 ? 'open' : '') + '" id="emailCard' + idx + '">'
+        + '<div class="email-card-header" onclick="toggleEmailCard(' + idx + ')">'
+        + '<div class="email-card-tag" style="color:' + em.tagColor + ';">' + em.tag + ' <span style="font-weight:400;color:var(--text-muted);font-size:0.75rem;">(' + em.range + ')</span></div>'
+        + '<span class="chevron">\u25BC</span>'
+        + '</div>'
+        + '<div class="email-card-body">'
+        + '<div class="email-subject">Subject: ' + esc(em.subject) + '</div>'
+        + '<div class="email-body-text">' + esc(em.body) + '</div>'
+        + '<div style="display:flex;align-items:center;">'
+        + '<button class="btn btn-primary btn-sm" onclick="copyEmail(' + idx + ')">&#128203; Copy to Clipboard</button>'
+        + '<span class="copy-feedback" id="copyFeedback' + idx + '">\u2713 Copied!</span>'
+        + '</div>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
   document.getElementById('emailModal').classList.add('active');
 }
 
@@ -1269,16 +1688,16 @@ function toggleEmailCard(idx) {
   document.getElementById('emailCard' + idx).classList.toggle('open');
 }
 
+// [Fix 11] Uses module-scoped currentEmailTemplates
 function copyEmail(idx) {
-  const emails = document.getElementById('emailModalBody')._emails;
-  if (!emails || !emails[idx]) return;
-  const em = emails[idx];
-  const text = `Subject: ${em.subject}\n\n${em.body}`;
-  navigator.clipboard.writeText(text).then(() => {
-    const fb = document.getElementById('copyFeedback' + idx);
+  if (!currentEmailTemplates || !currentEmailTemplates[idx]) return;
+  var em = currentEmailTemplates[idx];
+  var text = 'Subject: ' + em.subject + '\n\n' + em.body;
+  navigator.clipboard.writeText(text).then(function() {
+    var fb = document.getElementById('copyFeedback' + idx);
     fb.classList.add('show');
-    setTimeout(() => fb.classList.remove('show'), 2000);
-  }).catch(() => {
+    setTimeout(function() { fb.classList.remove('show'); }, 2000);
+  }).catch(function() {
     showToast('Failed to copy. Try selecting manually.', 'error');
   });
 }
@@ -1288,15 +1707,15 @@ function closeEmailModal() {
 }
 
 // Close modals on overlay click
-document.getElementById('emailModal').addEventListener('click', (e) => {
+document.getElementById('emailModal').addEventListener('click', function(e) {
   if (e.target === e.currentTarget) closeEmailModal();
 });
-document.getElementById('paidModal').addEventListener('click', (e) => {
+document.getElementById('paidModal').addEventListener('click', function(e) {
   if (e.target === e.currentTarget) closePaidModal();
 });
 
 // Close modals on Escape
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     closeEmailModal();
     closePaidModal();
@@ -1304,18 +1723,19 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ==================== TOAST ====================
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-  toast.innerHTML = `<span>${icons[type] || ''}</span> ${esc(message)}`;
+function showToast(message, type) {
+  type = type || 'info';
+  var container = document.getElementById('toastContainer');
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  var icons = { success: '\u2705', error: '\u274C', info: '\u2139\uFE0F' };
+  toast.innerHTML = '<span>' + (icons[type] || '') + '</span> ' + esc(message);
   container.appendChild(toast);
-  setTimeout(() => {
+  setTimeout(function() {
     toast.style.opacity = '0';
     toast.style.transform = 'translateX(100%)';
     toast.style.transition = 'all 0.3s';
-    setTimeout(() => toast.remove(), 300);
+    setTimeout(function() { toast.remove(); }, 300);
   }, 3000);
 }
 </script>
